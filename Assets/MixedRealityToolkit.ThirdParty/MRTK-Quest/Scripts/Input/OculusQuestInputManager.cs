@@ -100,6 +100,8 @@ namespace prvncher.MixedReality.Toolkit.OculusQuestInput
                 // Instantiate camera rig as a child of the MixedRealityPlayspace
                 cameraRig = GameObject.Instantiate(MRTKOculusConfig.Instance.OVRCameraRigPrefab);
             }
+            // Ensure all related game objects are configured
+            cameraRig.EnsureGameObjectIntegrity();
 
             bool useAvatarHands = MRTKOculusConfig.Instance.RenderAvatarHandsInsteadOfController;
             // If using Avatar hands, de-activate ovr controller rendering
@@ -108,7 +110,7 @@ namespace prvncher.MixedReality.Toolkit.OculusQuestInput
                 controllerHelper.gameObject.SetActive(!useAvatarHands);
             }
 
-            if (useAvatarHands)
+            if (useAvatarHands && !MRTKOculusConfig.Instance.AllowDevToManageAvatarPrefab)
             {
                 // Initialize the local avatar controller
                 GameObject.Instantiate(MRTKOculusConfig.Instance.LocalAvatarPrefab, cameraRig.trackingSpace);

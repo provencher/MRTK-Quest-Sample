@@ -817,6 +817,30 @@ public class OVRManager : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Let the system decide the best foveation level adaptively (Off .. fixedFoveatedRenderingLevel)
+	/// This feature is only supported on QCOMM-based Android devices
+	/// </summary>
+	public static bool useDynamicFixedFoveatedRendering
+	{
+		get
+		{
+			if (!OVRPlugin.fixedFoveatedRenderingSupported)
+			{
+				Debug.LogWarning("Fixed Foveated Rendering feature is not supported");
+			}
+			return OVRPlugin.useDynamicFixedFoveatedRendering;
+		}
+		set
+		{
+			if (!OVRPlugin.fixedFoveatedRenderingSupported)
+			{
+				Debug.LogWarning("Fixed Foveated Rendering feature is not supported");
+			}
+			OVRPlugin.useDynamicFixedFoveatedRendering = value;
+		}
+	}
+
 	[Obsolete("Please use fixedFoveatedRenderingSupported instead", false)]
 	public static bool tiledMultiResSupported
 	{

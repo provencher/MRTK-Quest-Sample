@@ -75,6 +75,15 @@ namespace prvncher.MixedReality.Toolkit.Config
         public OVRCameraRig OVRCameraRigPrefab => ovrCameraRigPrefab;
 
         [SerializeField]
+        [Tooltip("Use this if you want to manage the avatar hands prefab yourself.")]
+        private bool allowDevToManageAvatarPrefab = false;
+
+        /// <summary>
+        /// Use this if you want to manage the avatar hands prefab yourself.
+        /// </summary>
+        public bool AllowDevToManageAvatarPrefab => allowDevToManageAvatarPrefab;
+
+        [SerializeField]
         [Tooltip("Prefab reference for LocalAvatar to load, if none are found in scene.")]
         private GameObject localAvatarPrefab = null;
 

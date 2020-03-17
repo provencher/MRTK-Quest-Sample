@@ -37,9 +37,11 @@ public class OVRGrabber : MonoBehaviour
     [SerializeField]
     protected bool m_parentHeldObject = false;
 
-    // If true, will move the hand to the transform specified by m_parentTransform, using MovePosition in
-    // FixedUpdate. This allows correct physics behavior, at the cost of some latency.
-    // (If false, the hand can simply be attached to the hand anchor, which updates position in LateUpdate,
+	// If true, this script will move the hand to the transform specified by m_parentTransform, using MovePosition in
+	// FixedUpdate. This allows correct physics behavior, at the cost of some latency. In this usage scenario, you
+	// should NOT parent the hand to the hand anchor.
+	// (If m_moveHandPosition is false, this script will NOT update the game object's position.
+	// The hand gameObject can simply be attached to the hand anchor, which updates position in LateUpdate,
     // gaining us a few ms of reduced latency.)
     [SerializeField]
     protected bool m_moveHandPosition = false;
@@ -56,6 +58,9 @@ public class OVRGrabber : MonoBehaviour
     [SerializeField]
     protected OVRInput.Controller m_controller;
 
+	// You can set this explicitly in the inspector if you're using m_moveHandPosition.
+	// Otherwise, you should typically leave this null and simply parent the hand to the hand anchor
+	// in your scene, using Unity's inspector.
     [SerializeField]
     protected Transform m_parentTransform;
 
@@ -117,16 +122,7 @@ public class OVRGrabber : MonoBehaviour
         m_lastRot = transform.rotation;
         if(m_parentTransform == null)
         {
-            if(gameObject.transform.parent != null)
-            {
-                m_parentTransform = gameObject.transform.parent.transform;
-            }
-            else
-            {
-                m_parentTransform = new GameObject().transform;
-                m_parentTransform.position = Vector3.zero;
-                m_parentTransform.rotation = Quaternion.identity;
-            }
+			m_parentTransform = gameObject.transform;
         }
 		// We're going to setup the player collision to ignore the hand collision.
 		SetPlayerIgnoreCollision(gameObject, true);

@@ -313,23 +313,51 @@ namespace prvncher.MixedReality.Toolkit.OculusQuestInput
 
             CoreServices.InputSystem?.RaiseHandJointsUpdated(InputSource, ControllerHandedness, jointPoses);
 
-            if (IsPinching)
+            // Note: After some testing, it seems when moving your hand fast, Oculus's pinch estimation data gets frozen, which leads to stuck pinches.
+            // To counter this, we perform a distance check between thumb and index to determine if we should force the pinch to a false state.
+            float pinchStrength;
+            if (AreIndexAndThumbFarApart())
             {
-                // If we are already pinching, we make the pinch a bit sticky
-                IsPinching = ovrHand.GetFingerPinchStrength(OVRHand.HandFinger.Index) > 0.85f;
+                pinchStrength = 0f;
+                IsPinching = false;
             }
             else
             {
-                // If not yet pinching, only consider pinching if finger confidence is high
-                IsPinching = ovrHand.GetFingerIsPinching(OVRHand.HandFinger.Index)
-                             && ovrHand.GetFingerConfidence(OVRHand.HandFinger.Index) == OVRHand.TrackingConfidence.High;
+                pinchStrength = ovrHand.GetFingerPinchStrength(OVRHand.HandFinger.Index);
+                if (IsPinching)
+                {
+                    // If we are already pinching, we make the pinch a bit sticky
+                    IsPinching = ovrHand.GetFingerPinchStrength(OVRHand.HandFinger.Index) > 0.85f;
+                }
+                else
+                {
+                    // If not yet pinching, only consider pinching if finger confidence is high
+                    IsPinching = ovrHand.GetFingerIsPinching(OVRHand.HandFinger.Index)
+                                 && ovrHand.GetFingerConfidence(OVRHand.HandFinger.Index) == OVRHand.TrackingConfidence.High;
+                }
             }
 
             if (MRTKOculusConfig.Instance.UpdateMaterialPinchStrengthValue && handMaterial != null)
             {
-                handMaterial.SetFloat(pinchStrengthProp, ovrHand.GetFingerPinchStrength(OVRHand.HandFinger.Index));
+                handMaterial.SetFloat(pinchStrengthProp, pinchStrength);
             }
             return isTracked;
+        }
+
+        // 4 cm is the treshold for fingers being far apart.
+        // 0.0016 is the square magnitude equivalent
+        // Square magnitude is less expensive to perform than a distance check
+        private const float IndexThumbSqrMagnitudeThreshold = 0.0016f;
+        private bool AreIndexAndThumbFarApart()
+        {
+            MixedRealityPose indexPose = MixedRealityPose.ZeroIdentity;
+            TryGetJoint(TrackedHandJoint.IndexTip, out indexPose);
+
+            MixedRealityPose thumbPose = MixedRealityPose.ZeroIdentity;
+            TryGetJoint(TrackedHandJoint.ThumbTip, out thumbPose);
+
+            Vector3 distanceVector = indexPose.Position - thumbPose.Position;
+            return distanceVector.sqrMagnitude > IndexThumbSqrMagnitudeThreshold;
         }
 
         protected void UpdateBone(OVRBone bone)

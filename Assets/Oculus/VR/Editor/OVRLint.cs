@@ -711,7 +711,7 @@ public class OVRLint : EditorWindow
 				}, materials[i], false, "Fix");
 			}
 
-			if (materials[i].passCount > 1)
+			if (materials[i].passCount > 2)
 			{
 				AddFix("Material Passes", "Please use 2 or fewer passes in materials.", null, materials[i], false);
 			}

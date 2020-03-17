@@ -10,9 +10,9 @@ Further, to make this easier for people who struggle with Git to download, the r
 
 Current setup:
 - [MRTK](https://github.com/microsoft/MixedRealityToolkit-Unity) V2.3
-- [Oculus Integration v13](https://assetstore.unity.com/packages/tools/integration/oculus-integration-82022)
-- [MRTK-Quest](https://github.com/provencher/MRTK-Quest) V0.6
+- [Oculus Integration](https://assetstore.unity.com/packages/tools/integration/oculus-integration-82022) v14
+- [MRTK-Quest](https://github.com/provencher/MRTK-Quest/releases/tag/v0.6.1) V0.6.1
 
-In order to add example content, download the following packages and add them to the project:
-- [MRTK-Examples v2.3](https://github.com/microsoft/MixedRealityToolkit-Unity/releases/download/v2.3.0/Microsoft.MixedReality.Toolkit.Unity.Examples.2.3.0.unitypackage)
-- [MRTK-Quest Examples v0.6](https://github.com/provencher/MRTK-Quest/releases/download/v0.6.0/MRTK-Quest_Examples_v060.unitypackage)
+In order to add example content, download the following packages and add them to the project. Both packages are **required**.
+- [MRTK-Examples](https://github.com/microsoft/MixedRealityToolkit-Unity/releases/download/v2.3.0/Microsoft.MixedReality.Toolkit.Unity.Examples.2.3.0.unitypackage) v2.3
+- [MRTK-Quest Examples](https://github.com/provencher/MRTK-Quest/releases/download/v0.6.1/MRTK-Quest_v061_Examples.unitypackage) V0.6.1

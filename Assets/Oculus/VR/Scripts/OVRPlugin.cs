@@ -43,7 +43,7 @@ public static class OVRPlugin
 #if OVRPLUGIN_UNSUPPORTED_PLATFORM
 	public static readonly System.Version wrapperVersion = _versionZero;
 #else
-	public static readonly System.Version wrapperVersion = OVRP_1_45_0.version;
+	public static readonly System.Version wrapperVersion = OVRP_1_46_0.version;
 #endif
 
 #if !OVRPLUGIN_UNSUPPORTED_PLATFORM
@@ -3409,6 +3409,46 @@ public static class OVRPlugin
 		}
 	}
 
+	public static bool useDynamicFixedFoveatedRendering
+	{
+		get
+		{
+#if OVRPLUGIN_UNSUPPORTED_PLATFORM
+			return false;
+#else
+			if (version >= OVRP_1_46_0.version && fixedFoveatedRenderingSupported)
+			{
+				Bool isDynamic = Bool.False;
+				Result result = OVRP_1_46_0.ovrp_GetTiledMultiResDynamic(out isDynamic);
+				if (result != Result.Success)
+				{
+					//Debug.LogWarning("ovrp_GetTiledMultiResDynamic return " + result);
+				}
+				return isDynamic != Bool.False;
+			}
+			else
+			{
+				return false;
+			}
+#endif
+		}
+		set
+		{
+#if OVRPLUGIN_UNSUPPORTED_PLATFORM
+			return;
+#else
+			if (version >= OVRP_1_46_0.version && fixedFoveatedRenderingSupported)
+			{
+				Result result = OVRP_1_46_0.ovrp_SetTiledMultiResDynamic(value ? Bool.True : Bool.False);
+				if (result != Result.Success)
+				{
+					//Debug.LogWarning("ovrp_SetTiledMultiResDynamic return " + result);
+				}
+			}
+#endif
+		}
+	}
+
 	[Obsolete("Please use fixedFoveatedRenderingSupported instead", false)]
 	public static bool tiledMultiResSupported
 	{
@@ -5392,6 +5432,18 @@ public static class OVRPlugin
 
 		[DllImport(pluginName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern Result ovrp_GetSystemHmd3DofModeEnabled(ref Bool enabled);
+	}
+
+	private static class OVRP_1_46_0
+	{
+		public static readonly System.Version version = new System.Version(1, 46, 0);
+
+		[DllImport(pluginName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern Result ovrp_GetTiledMultiResDynamic(out Bool isDynamic);
+
+
+		[DllImport(pluginName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern Result ovrp_SetTiledMultiResDynamic(Bool isDynamic);
 	}
 
 #endif // !OVRPLUGIN_UNSUPPORTED_PLATFORM

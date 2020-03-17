@@ -204,196 +204,35 @@ public class OVRGradleGeneration
 	public void PatchAndroidManifest(string path)
 	{
 		string manifestFolder = Path.Combine(path, "src/main");
-		try
+		string file = manifestFolder + "/AndroidManifest.xml";
+
+		bool patchedSecurityConfig = false;
+		// If Enable NSC Config, copy XML file into gradle project
+		OVRProjectConfig projectConfig = OVRProjectConfig.GetProjectConfig();
+		if (projectConfig != null)
 		{
-			// Load android manfiest file
-			XmlDocument doc = new XmlDocument();
-			doc.Load(manifestFolder + "/AndroidManifest.xml");
-
-			string androidNamepsaceURI;
-			XmlElement element = (XmlElement)doc.SelectSingleNode("/manifest");
-			if (element == null)
+			if (projectConfig.enableNSCConfig)
 			{
-				UnityEngine.Debug.LogError("Could not find manifest tag in android manifest.");
-				return;
-			}
 
-			// Get android namespace URI from the manifest
-			androidNamepsaceURI = element.GetAttribute("xmlns:android");
-			if (!string.IsNullOrEmpty(androidNamepsaceURI))
-			{
-				// Look for intent filter category and change LAUNCHER to INFO
-				XmlNodeList nodeList = doc.SelectNodes("/manifest/application/activity/intent-filter/category");
-				foreach (XmlElement e in nodeList)
+				string securityConfigFile = GetOculusProjectNetworkSecConfigPath();
+				string xmlDirectory = Path.Combine(path, "src/main/res/xml");
+				try
 				{
-					string attr = e.GetAttribute("name", androidNamepsaceURI);
-					if (attr == "android.intent.category.LAUNCHER")
+					if (!Directory.Exists(xmlDirectory))
 					{
-						e.SetAttribute("name", androidNamepsaceURI, "android.intent.category.INFO");
+						Directory.CreateDirectory(xmlDirectory);
 					}
+					File.Copy(securityConfigFile, Path.Combine(xmlDirectory, "network_sec_config.xml"), true);
+					patchedSecurityConfig = true;
 				}
-
-				//If Quest is the target device, add the headtracking manifest tag
-				if (OVRDeviceSelector.isTargetDeviceQuest)
+				catch (Exception e)
 				{
-					XmlNodeList manifestUsesFeatureNodes = doc.SelectNodes("/manifest/uses-feature");
-					bool foundHeadtrackingTag = false;
-					foreach (XmlElement e in manifestUsesFeatureNodes)
-					{
-						string attr = e.GetAttribute("name", androidNamepsaceURI);
-						if (attr == "android.hardware.vr.headtracking")
-							foundHeadtrackingTag = true;
-					}
-					//If the tag already exists, don't patch with a new one. If it doesn't, we add it.
-					if (!foundHeadtrackingTag)
-					{
-						XmlNode manifestElement = doc.SelectSingleNode("/manifest");
-						XmlElement headtrackingTag = doc.CreateElement("uses-feature");
-						headtrackingTag.SetAttribute("name", androidNamepsaceURI, "android.hardware.vr.headtracking");
-						headtrackingTag.SetAttribute("version", androidNamepsaceURI, "1");
-						string tagRequired = OVRDeviceSelector.isTargetDeviceGearVrOrGo ? "false" : "true";
-						headtrackingTag.SetAttribute("required", androidNamepsaceURI, tagRequired);
-						manifestElement.AppendChild(headtrackingTag);
-					}
+					UnityEngine.Debug.LogError(e.Message);
 				}
-
-				// If Quest is the target device, add the handtracking manifest tags if needed
-				// Mapping of project setting to manifest setting:
-				// OVRProjectConfig.HandTrackingSupport.ControllersOnly => manifest entry not present
-				// OVRProjectConfig.HandTrackingSupport.ControllersAndHands => manifest entry present and required=false
-				// OVRProjectConfig.HandTrackingSupport.HandsOnly => manifest entry present and required=true
-				if (OVRDeviceSelector.isTargetDeviceQuest)
-				{
-					OVRProjectConfig.HandTrackingSupport targetHandTrackingSupport = OVRProjectConfig.GetProjectConfig().handTrackingSupport;
-					bool handTrackingEntryNeeded = (targetHandTrackingSupport != OVRProjectConfig.HandTrackingSupport.ControllersOnly);
-					if (handTrackingEntryNeeded)
-					{
-						// uses-feature: <uses-feature android:name="oculus.software.handtracking" android:required="false" />
-						XmlNodeList manifestUsesFeatureNodes = doc.SelectNodes("/manifest/uses-feature");
-						bool foundHandTrackingFeature = false;
-						foreach (XmlElement e in manifestUsesFeatureNodes)
-						{
-							string attr = e.GetAttribute("name", androidNamepsaceURI);
-							if (attr == "oculus.software.handtracking")
-								foundHandTrackingFeature = true;
-						}
-						//If the tag already exists, don't patch with a new one. If it doesn't, we add it.
-						if (!foundHandTrackingFeature)
-						{
-							XmlNode manifestElement = doc.SelectSingleNode("/manifest");
-							XmlElement handTrackingFeature = doc.CreateElement("uses-feature");
-							handTrackingFeature.SetAttribute("name", androidNamepsaceURI, "oculus.software.handtracking");
-							string tagRequired = (targetHandTrackingSupport == OVRProjectConfig.HandTrackingSupport.HandsOnly) ? "true" : "false";
-							handTrackingFeature.SetAttribute("required", androidNamepsaceURI, tagRequired);
-							manifestElement.AppendChild(handTrackingFeature);
-						}
-
-						// uses-permission: <uses-permission android:name="oculus.permission.handtracking" />
-						XmlNodeList manifestUsesPermissionNodes = doc.SelectNodes("/manifest/uses-permission");
-						bool foundHandTrackingPermission = false;
-						foreach (XmlElement e in manifestUsesPermissionNodes)
-						{
-							string attr = e.GetAttribute("name", androidNamepsaceURI);
-							if (attr == "oculus.permission.handtracking")
-								foundHandTrackingPermission = true;
-						}
-						//If the tag already exists, don't patch with a new one. If it doesn't, we add it.
-						if (!foundHandTrackingPermission)
-						{
-							XmlNode manifestElement = doc.SelectSingleNode("/manifest");
-							XmlElement handTrackingPermission = doc.CreateElement("uses-permission");
-							handTrackingPermission.SetAttribute("name", androidNamepsaceURI, "oculus.permission.handtracking");
-							manifestElement.AppendChild(handTrackingPermission);
-						}
-					}
-				}
-
-				XmlElement applicationNode = (XmlElement)doc.SelectSingleNode("/manifest/application");
-				if(applicationNode != null)
-				{
-					// If android label and icon are missing from the xml, add them
-					if (applicationNode.GetAttribute("android:label") == null)
-					{
-						applicationNode.SetAttribute("label", androidNamepsaceURI, "@string/app_name");
-					}
-					if (applicationNode.GetAttribute("android:icon") == null)
-					{
-						applicationNode.SetAttribute("icon", androidNamepsaceURI, "@mipmap/app_icon");
-					}
-
-					// Check for VR tag, if missing, append it
-					bool vrTagFound = false;
-					XmlNodeList appNodeList = applicationNode.ChildNodes;
-					foreach (XmlElement e in appNodeList)
-					{
-						if (e.GetAttribute("android:name") == "com.samsung.android.vr.application.mode")
-						{
-							vrTagFound = true;
-							break;
-						}
-					}
-
-					if (!vrTagFound)
-					{
-						XmlElement vrTag = doc.CreateElement("meta-data");
-						vrTag.SetAttribute("name", androidNamepsaceURI, "com.samsung.android.vr.application.mode");
-						vrTag.SetAttribute("value", androidNamepsaceURI, "vr_only");
-						applicationNode.AppendChild(vrTag); ;
-					}
-
-					// Disable allowBackup in manifest and add Android NSC XML file
-					OVRProjectConfig projectConfig = OVRProjectConfig.GetProjectConfig();
-					if (projectConfig != null)
-					{
-						if (projectConfig.disableBackups)
-						{
-							applicationNode.SetAttribute("allowBackup", androidNamepsaceURI, "false");
-						}
-
-						if (projectConfig.enableNSCConfig)
-						{
-							applicationNode.SetAttribute("networkSecurityConfig", androidNamepsaceURI, "@xml/network_sec_config");
-
-							string securityConfigFile = GetOculusProjectNetworkSecConfigPath();
-							string xmlDirectory = Path.Combine(path, "src/main/res/xml");
-							try
-							{
-								if (!Directory.Exists(xmlDirectory))
-								{
-									Directory.CreateDirectory(xmlDirectory);
-								}
-								File.Copy(securityConfigFile, Path.Combine(xmlDirectory, "network_sec_config.xml"), true);
-							}
-							catch (Exception e)
-							{
-								UnityEngine.Debug.LogError(e.Message);
-							}
-						}
-
-						// If only targeting Quest, check for focus aware support
-						if (OVRDeviceSelector.isTargetDeviceQuest)
-						{
-							if (projectConfig.focusAware)
-							{
-								XmlElement activityNode = (XmlElement)doc.SelectSingleNode("/manifest/application/activity");
-								if (activityNode != null)
-								{
-									XmlElement focusAwareTag = doc.CreateElement("meta-data");
-									focusAwareTag.SetAttribute("name", androidNamepsaceURI, "com.oculus.vr.focusaware");
-									focusAwareTag.SetAttribute("value", androidNamepsaceURI, "true");
-									activityNode.AppendChild(focusAwareTag);
-								}
-							}
-						}
-					}
-				}
-				doc.Save(manifestFolder + "/AndroidManifest.xml");
 			}
 		}
-		catch (Exception e)
-		{
-			UnityEngine.Debug.LogError(e.Message);
-		}
+
+		OVRManifestPreprocessor.PatchAndroidManifest(file, enableSecurity: patchedSecurityConfig);
 	}
 
 	private static string GetOculusProjectNetworkSecConfigPath()

@@ -39,6 +39,9 @@ namespace Oculus.Platform
       NetSync_Connect                               = 0x646D855F,
       NetSync_Disconnect                            = 0x1569FEB5,
       NetSync_GetSessions                           = 0x6ED60A35,
+      NetSync_GetVoipAttenuation                    = 0x112ACA17,
+      NetSync_GetVoipAttenuationDefault             = 0x577BA8A0,
+      NetSync_SetVoipAttenuation                    = 0x3497D7F6,
       NetSync_SetVoipGroup                          = 0x58129C8E,
       NetSync_SetVoipMicSource                      = 0x3302F770,
       NetSync_SetVoipSessionMuted                   = 0x5585FF0A,
@@ -97,6 +100,7 @@ namespace Oculus.Platform
         case MessageTypeInternal.Colocation_ShareMap:
         case MessageTypeInternal.Livestreaming_StopPartyStream:
         case MessageTypeInternal.Livestreaming_UpdateMicStatus:
+        case MessageTypeInternal.NetSync_SetVoipAttenuation:
         case MessageTypeInternal.NetSync_SetVoipGroup:
         case MessageTypeInternal.NetSync_SetVoipMicSource:
         case MessageTypeInternal.Party_Leave:
@@ -154,6 +158,11 @@ namespace Oculus.Platform
         case MessageTypeInternal.NetSync_SetVoipSessionMuted:
         case MessageTypeInternal.NetSync_SetVoipStreamMode:
           message = new MessageWithNetSyncSetSessionPropertyResult(messageHandle);
+          break;
+
+        case MessageTypeInternal.NetSync_GetVoipAttenuation:
+        case MessageTypeInternal.NetSync_GetVoipAttenuationDefault:
+          message = new MessageWithNetSyncVoipAttenuationValueList(messageHandle);
           break;
 
         case MessageTypeInternal.Party_Get:

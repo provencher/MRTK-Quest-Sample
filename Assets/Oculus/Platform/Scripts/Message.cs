@@ -331,6 +331,7 @@ namespace Oculus.Platform
     public virtual NetSyncSessionList GetNetSyncSessionList() { return null; }
     public virtual NetSyncSessionsChangedNotification GetNetSyncSessionsChangedNotification() { return null; }
     public virtual NetSyncSetSessionPropertyResult GetNetSyncSetSessionPropertyResult() { return null; }
+    public virtual NetSyncVoipAttenuationValueList GetNetSyncVoipAttenuationValueList() { return null; }
     public virtual OrgScopedID GetOrgScopedID() { return null; }
     public virtual Party GetParty() { return null; }
     public virtual PartyID GetPartyID() { return null; }
@@ -1176,6 +1177,18 @@ namespace Oculus.Platform
       var msg = CAPI.ovr_Message_GetNativeMessage(c_message);
       var obj = CAPI.ovr_Message_GetNetSyncSetSessionPropertyResult(msg);
       return new NetSyncSetSessionPropertyResult(obj);
+    }
+
+  }
+  public class MessageWithNetSyncVoipAttenuationValueList : Message<NetSyncVoipAttenuationValueList>
+  {
+    public MessageWithNetSyncVoipAttenuationValueList(IntPtr c_message) : base(c_message) { }
+    public override NetSyncVoipAttenuationValueList GetNetSyncVoipAttenuationValueList() { return Data; }
+    protected override NetSyncVoipAttenuationValueList GetDataFromMessage(IntPtr c_message)
+    {
+      var msg = CAPI.ovr_Message_GetNativeMessage(c_message);
+      var obj = CAPI.ovr_Message_GetNetSyncVoipAttenuationValueArray(msg);
+      return new NetSyncVoipAttenuationValueList(obj);
     }
 
   }
