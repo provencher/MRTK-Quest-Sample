@@ -8,6 +8,8 @@ As such, I'll update this repository with the latest releases of MRTK, Oculus in
 Note, this repository does not contain any example content in order to keep the footprint as small as possible.
 Further, to make this easier for people who struggle with Git to download, the repository **does not** use submodules, symlinks or git lfs.
 
+Be sure to check out the MRTK-Quest FAQ in the [Readme](https://github.com/provencher/MRTK-Quest/blob/master/README.md).
+
 Current setup:
 - [MRTK](https://github.com/microsoft/MixedRealityToolkit-Unity) V2.3
 - [Oculus Integration](https://assetstore.unity.com/packages/tools/integration/oculus-integration-82022) v16
