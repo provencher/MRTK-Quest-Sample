@@ -57,17 +57,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114252240061623322, guid: 835e735ca71bf78459fb2cababd74112,
         type: 3}
-      propertyPath: _confidenceBehavior
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114252240061623322, guid: 835e735ca71bf78459fb2cababd74112,
-        type: 3}
       propertyPath: _systemGestureBehavior
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114392993255165844, guid: 835e735ca71bf78459fb2cababd74112,
-        type: 3}
-      propertyPath: _confidenceBehavior
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
