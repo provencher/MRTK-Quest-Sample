@@ -42,6 +42,9 @@ public class OVRExternalComposition : OVRComposition
 
 	// when rendererSupportsCameraRect is false, mrcRenderTextureArray would only store the background frame (regular width)
 	public RenderTexture[] mrcForegroundRenderTextureArray = new RenderTexture[2];
+
+	// this is used for moving MRC camera where we would need to be able to synchronize the camera position from the game with that on the client for composition
+	public double[] cameraPoseTimeArray = new double[2];
 #endif
 
 	public override OVRManager.CompositionMethod CompositionMethod() { return OVRManager.CompositionMethod.External; }
@@ -65,6 +68,7 @@ public class OVRExternalComposition : OVRComposition
 		{
 			mrcRenderTextureArray[i] = new RenderTexture(renderCombinedFrame ? frameWidth : frameWidth/2, frameHeight, 24, RenderTextureFormat.ARGB32);
 			mrcRenderTextureArray[i].Create();
+			cameraPoseTimeArray[i] = 0.0;
 		}
 
 		frameIndex = 0;
@@ -226,11 +230,11 @@ public class OVRExternalComposition : OVRComposition
 		{
 			ret = OVRPlugin.Media.EncodeMrcFrame(mrcRenderTextureArray[castTextureIndex].GetNativeTexturePtr(),
 				renderCombinedFrame ? System.IntPtr.Zero : mrcForegroundRenderTextureArray[castTextureIndex].GetNativeTexturePtr(),
-				cachedAudioDataArray, audioFrames, audioChannels, AudioSettings.dspTime, ref syncId);
+				cachedAudioDataArray, audioFrames, audioChannels, AudioSettings.dspTime, cameraPoseTimeArray[castTextureIndex], ref syncId);
 		}
 		else
 		{
-			ret = OVRPlugin.Media.EncodeMrcFrame(mrcRenderTextureArray[castTextureIndex], cachedAudioDataArray, audioFrames, audioChannels, AudioSettings.dspTime, ref syncId);
+			ret = OVRPlugin.Media.EncodeMrcFrame(mrcRenderTextureArray[castTextureIndex], cachedAudioDataArray, audioFrames, audioChannels, AudioSettings.dspTime, cameraPoseTimeArray[castTextureIndex], ref syncId);
 		}
 
 		if (!ret)
@@ -278,6 +282,14 @@ public class OVRExternalComposition : OVRComposition
 		RefreshCameraObjects(gameObject, mainCamera);
 
 		OVRPlugin.SetHandNodePoseStateLatency(0.0);     // the HandNodePoseStateLatency doesn't apply to the external composition. Always enforce it to 0.0
+
+		// For third-person camera to use for calculating camera position with different anchors
+		OVRPose stageToLocalPose = OVRPlugin.GetTrackingTransformRelativePose(OVRPlugin.TrackingOrigin.Stage).ToOVRPose();
+		OVRPose localToStagePose = stageToLocalPose.Inverse();
+		OVRPose head = localToStagePose * OVRPlugin.GetNodePose(OVRPlugin.Node.Head, OVRPlugin.Step.Render).ToOVRPose();
+		OVRPose leftC = localToStagePose * OVRPlugin.GetNodePose(OVRPlugin.Node.HandLeft, OVRPlugin.Step.Render).ToOVRPose();
+		OVRPose rightC = localToStagePose * OVRPlugin.GetNodePose(OVRPlugin.Node.HandRight, OVRPlugin.Step.Render).ToOVRPose();
+		OVRPlugin.Media.SetMrcHeadsetControllerPose(head.ToPosef(), leftC.ToPosef(), rightC.ToPosef());
 
 #if OVR_ANDROID_MRC
 		RefreshAudioFilter();
@@ -365,6 +377,9 @@ public class OVRExternalComposition : OVRComposition
 					backgroundCamera.transform.FromOVRPose(worldSpacePose);
 					foregroundCamera.transform.FromOVRPose(worldSpacePose);
 				}
+#if OVR_ANDROID_MRC
+				cameraPoseTimeArray[drawTextureIndex] = extrinsics.LastChangedTimeSeconds;
+#endif
 			}
 			else
 			{

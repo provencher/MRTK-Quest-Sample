@@ -63,6 +63,7 @@ public class OVRHand : MonoBehaviour,
 	public Transform PointerPose { get; private set; }
 	public float HandScale { get; private set; }
 	public TrackingConfidence HandConfidence { get; private set; }
+	public bool IsDominantHand { get; private set; }
 
 	private void Awake()
 	{
@@ -93,6 +94,7 @@ public class OVRHand : MonoBehaviour,
 			IsTracked = (_handState.Status & OVRPlugin.HandStatus.HandTracked) != 0;
 			IsSystemGestureInProgress = (_handState.Status & OVRPlugin.HandStatus.SystemGestureInProgress) != 0;
 			IsPointerPoseValid = (_handState.Status & OVRPlugin.HandStatus.InputStateValid) != 0;
+			IsDominantHand = (_handState.Status & OVRPlugin.HandStatus.DominantHand) != 0;
 			PointerPose.localPosition = _handState.PointerPose.Position.FromFlippedZVector3f();
 			PointerPose.localRotation = _handState.PointerPose.Orientation.FromFlippedZQuatf();
 			HandScale = _handState.HandScale;

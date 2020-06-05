@@ -2511,7 +2511,7 @@ public static class OVRInput
 			buttonMap.Two                      = RawButton.None;
 			buttonMap.Three                    = RawButton.X;
 			buttonMap.Four                     = RawButton.None;
-			buttonMap.Start                    = RawButton.None;
+			buttonMap.Start                    = RawButton.Start;
 			buttonMap.Back                     = RawButton.None;
 			buttonMap.PrimaryShoulder          = RawButton.None;
 			buttonMap.PrimaryIndexTrigger      = RawButton.None;
@@ -2619,7 +2619,7 @@ public static class OVRInput
 			buttonMap.Two                      = RawButton.None;
 			buttonMap.Three                    = RawButton.None;
 			buttonMap.Four                     = RawButton.None;
-			buttonMap.Start                    = RawButton.None;
+			buttonMap.Start                    = RawButton.Start;
 			buttonMap.Back                     = RawButton.None;
 			buttonMap.PrimaryShoulder          = RawButton.None;
 			buttonMap.PrimaryIndexTrigger      = RawButton.None;
@@ -2723,7 +2723,7 @@ public static class OVRInput
 			buttonMap.Two                      = RawButton.None;
 			buttonMap.Three                    = RawButton.None;
 			buttonMap.Four                     = RawButton.None;
-			buttonMap.Start                    = RawButton.None;
+			buttonMap.Start                    = RawButton.Start;
 			buttonMap.Back                     = RawButton.None;
 			buttonMap.PrimaryShoulder          = RawButton.None;
 			buttonMap.PrimaryIndexTrigger      = RawButton.None;

@@ -1,0 +1,15 @@
+{
+    "name": "MRTK-Quest.Examples",
+    "references": [
+        "Microsoft.MixedReality.Toolkit.Examples",
+        "prvncher.MRTKQuest"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

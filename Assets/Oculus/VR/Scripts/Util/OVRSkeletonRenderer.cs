@@ -291,6 +291,9 @@ public class OVRSkeletonRenderer : MonoBehaviour
 				}
 			}
 
+#if UNITY_EDITOR
+			_ovrSkeleton.ShouldUpdateBonePoses = true;
+#endif
 			IsInitialized = true;
 		}
 	}

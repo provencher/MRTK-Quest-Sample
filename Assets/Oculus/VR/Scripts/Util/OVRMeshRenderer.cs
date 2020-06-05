@@ -102,13 +102,13 @@ public class OVRMeshRenderer : MonoBehaviour
 			_skinnedMeshRenderer = gameObject.AddComponent<SkinnedMeshRenderer>();
 		}
 
-		if (_ovrMesh.IsInitialized && _ovrSkeleton.IsInitialized)
+		if (_ovrMesh != null && _ovrSkeleton != null)
 		{
-			_skinnedMeshRenderer.sharedMesh = _ovrMesh.Mesh;
-			_originalMaterial = _skinnedMeshRenderer.sharedMaterial;
-
-			if (_ovrSkeleton != null)
+			if (_ovrMesh.IsInitialized && _ovrSkeleton.IsInitialized)
 			{
+				_skinnedMeshRenderer.sharedMesh = _ovrMesh.Mesh;
+				_originalMaterial = _skinnedMeshRenderer.sharedMaterial;
+
 				int numSkinnableBones = _ovrSkeleton.GetCurrentNumSkinnableBones();
 				var bindPoses = new Matrix4x4[numSkinnableBones];
 				var bones = new Transform[numSkinnableBones];
@@ -121,7 +121,9 @@ public class OVRMeshRenderer : MonoBehaviour
 				_ovrMesh.Mesh.bindposes = bindPoses;
 				_skinnedMeshRenderer.bones = bones;
 				_skinnedMeshRenderer.updateWhenOffscreen = true;
-
+#if UNITY_EDITOR
+				_ovrSkeleton.ShouldUpdateBonePoses = true;
+#endif
 				IsInitialized = true;
 			}
 		}

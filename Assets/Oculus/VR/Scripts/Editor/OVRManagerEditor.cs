@@ -33,13 +33,25 @@ public class OVRManagerEditor : Editor
 
 		DrawDefaultInspector();
 
+		bool modified = false;
+
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_ANDROID
 		OVRManager manager = (OVRManager)target;
+
+		EditorGUILayout.Space();
+		EditorGUILayout.LabelField("Display", EditorStyles.boldLabel);
+		OVREditorUtil.SetupBoolField(target, new GUIContent("Enable Specific Color Gamut",
+			"If checked, the target HMD will perform a color space transformation"), ref manager.enableColorGamut, ref modified);
+
+		if (manager.enableColorGamut)
+		{
+			OVREditorUtil.SetupEnumField(target, new GUIContent("Color Gamut",
+			"The target color gamut when displayed on the HMD"), ref manager.colorGamut, ref modified);
+		}
 #endif
 
-        bool modified = false;
 #if UNITY_ANDROID
-        EditorGUILayout.Space();
+		EditorGUILayout.Space();
         OVRProjectConfigEditor.DrawProjectConfigInspector(projectConfig);
 
 		EditorGUILayout.Space();

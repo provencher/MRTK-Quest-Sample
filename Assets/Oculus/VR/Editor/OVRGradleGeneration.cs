@@ -213,8 +213,20 @@ public class OVRGradleGeneration
 		{
 			if (projectConfig.enableNSCConfig)
 			{
+				// If no custom xml security path is specified, look for the default location in the integrations package.
+				string securityConfigFile = projectConfig.securityXmlPath;
+				if (string.IsNullOrEmpty(securityConfigFile))
+				{
+					securityConfigFile = GetOculusProjectNetworkSecConfigPath();
+				}
+				else
+				{
+					Uri configUri = new Uri(Path.GetFullPath(securityConfigFile));
+					Uri projectUri = new Uri(Application.dataPath);
+					Uri relativeUri = projectUri.MakeRelativeUri(configUri);
+					securityConfigFile = relativeUri.ToString();
+				}
 
-				string securityConfigFile = GetOculusProjectNetworkSecConfigPath();
 				string xmlDirectory = Path.Combine(path, "src/main/res/xml");
 				try
 				{

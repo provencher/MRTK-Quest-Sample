@@ -347,6 +347,12 @@ public class OVRManager : MonoBehaviour
 	[Tooltip("If true, dynamic resolution will be enabled On PC")]
 	public bool enableAdaptiveResolution = false;
 
+	[HideInInspector]
+	public bool enableColorGamut = false;
+
+	[HideInInspector]
+	public OVRPlugin.ColorSpace colorGamut = OVRPlugin.ColorSpace.Unknown;
+
 	/// <summary>
 	/// Adaptive Resolution is based on Unity engine's renderViewportScale/eyeTextureResolutionScale feature
 	/// But renderViewportScale was broken in an array of Unity engines, this function help to filter out those broken engines
@@ -1316,6 +1322,12 @@ public class OVRManager : MonoBehaviour
 				perfTcpServer.enabled = true;
 			}
 			OVRPlugin.SetDeveloperMode(OVRPlugin.Bool.True);
+		}
+
+		// Set the client color space description
+		if (enableColorGamut)
+		{
+			OVRPlugin.SetClientColorDesc(colorGamut);
 		}
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
