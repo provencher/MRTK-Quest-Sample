@@ -14,5 +14,5 @@ Current setup:
 - [MRTK-Quest](https://github.com/provencher/MRTK-Quest/releases/tag/v1.0.0) V1.0.0
 - [MRTK](https://github.com/microsoft/MixedRealityToolkit-Unity) V2.4
 - [Oculus Integration](https://assetstore.unity.com/packages/tools/integration/oculus-integration-82022) v17
-- Unity 2019.3.15f1
+- Unity 2019.4.0f1
 
