@@ -1,12 +1,12 @@
 /************************************************************************************
 Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
 
-Licensed under the Oculus Utilities SDK License Version 1.31 (the "License"); you may not use
+Licensed under the Oculus Master SDK License Version 1.0 (the "License"); you may not use
 the Utilities SDK except in compliance with the License, which is provided at the time of installation
 or download, or which otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
-https://developer.oculus.com/licenses/utilities-1.31
+https://developer.oculus.com/licenses/oculusmastersdk-1.0/
 
 Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
@@ -16,6 +16,10 @@ permissions and limitations under the License.
 
 #if USING_XR_MANAGEMENT && USING_XR_SDK_OCULUS
 #define USING_XR_SDK
+#endif
+
+#if UNITY_2020_1_OR_NEWER
+#define REQUIRES_XR_SDK
 #endif
 
 #if !(UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || (UNITY_ANDROID && !UNITY_EDITOR))
@@ -43,7 +47,7 @@ public static class OVRPlugin
 #if OVRPLUGIN_UNSUPPORTED_PLATFORM
 	public static readonly System.Version wrapperVersion = _versionZero;
 #else
-	public static readonly System.Version wrapperVersion = OVRP_1_49_0.version;
+	public static readonly System.Version wrapperVersion = OVRP_1_51_0.version;
 #endif
 
 #if !OVRPLUGIN_UNSUPPORTED_PLATFORM
@@ -133,18 +137,6 @@ public static class OVRPlugin
 		}
 	}
 
-	public static bool supportsGearVR
-	{
-		get
-		{
-#if OVRPLUGIN_UNSUPPORTED_PLATFORM
-			return false;
-#else
-			return wrapperVersion > _versionZero && wrapperVersion <= OVRP_1_41_0.version;
-#endif
-		}
-	}
-
 	[StructLayout(LayoutKind.Sequential)]
 	private class GUID
 	{
@@ -181,6 +173,8 @@ public static class OVRPlugin
 		Failure_NotYetImplemented = -1005,
 		Failure_OperationFailed = -1006,
 		Failure_InsufficientSize = -1007,
+		Failure_DataIsInvalid = -1008,
+		Failure_DeprecatedOperation = -1009
 	}
 
 	public enum CameraStatus
@@ -248,9 +242,6 @@ public static class OVRPlugin
 		LHand = 0x00000020,
 		RHand = 0x00000040,
 		Hands = LHand | RHand,
-		Touchpad = 0x08000000,
-		LTrackedRemote = 0x01000000,
-		RTrackedRemote = 0x02000000,
 		Active = unchecked((int)0x80000000),
 		All = ~None,
 	}
@@ -273,7 +264,6 @@ public static class OVRPlugin
 	public enum RecenterFlags
 	{
 		Default = 0,
-		Controllers = 0x40000000,
 		IgnoreAll = unchecked((int)0x80000000),
 		Count,
 	}
@@ -318,15 +308,8 @@ public static class OVRPlugin
 	{
 		None = 0,
 
-		// Mobile & Standalone headsets
-		GearVR_R320, // Note4 Innovator
-		GearVR_R321, // S6 Innovator
-		GearVR_R322, // Commercial 1
-		GearVR_R323, // Commercial 2 (USB Type C)
-		GearVR_R324, // Commercial 3 (USB Type C)
-		GearVR_R325, // Commercial 4 (USB Type C)
-		Oculus_Go,
-		Oculus_Quest,
+		// Standalone headsets
+		Oculus_Quest = 8,
 		Placeholder_9,
 		Placeholder_10,
 		Placeholder_11,
@@ -3780,32 +3763,6 @@ public static class OVRPlugin
 #endif
 	}
 
-	public static bool GetReorientHMDOnControllerRecenter()
-	{
-#if OVRPLUGIN_UNSUPPORTED_PLATFORM
-		return false;
-#else
-		Bool recenterMode;
-		if (version < OVRP_1_28_0.version || OVRP_1_28_0.ovrp_GetReorientHMDOnControllerRecenter(out recenterMode) != Result.Success)
-			return false;
-
-		return (recenterMode == Bool.True);
-#endif
-	}
-
-	public static bool SetReorientHMDOnControllerRecenter(bool recenterSetting)
-	{
-#if OVRPLUGIN_UNSUPPORTED_PLATFORM
-		return false;
-#else
-		Bool ovrpBoolRecenterSetting = recenterSetting ? Bool.True : Bool.False;
-		if (version < OVRP_1_28_0.version || OVRP_1_28_0.ovrp_SetReorientHMDOnControllerRecenter(ovrpBoolRecenterSetting) != Result.Success)
-			return false;
-
-		return true;
-#endif
-	}
-
 	public static bool SendEvent(string name, string param = "", string source = "")
 	{
 #if OVRPLUGIN_UNSUPPORTED_PLATFORM
@@ -3971,6 +3928,8 @@ public static class OVRPlugin
 		OculusXRPlugin.SetColorScale(colorScale.x, colorScale.y, colorScale.z, colorScale.w);
 		OculusXRPlugin.SetColorOffset(colorOffset.x, colorOffset.y, colorOffset.z, colorOffset.w);
 		return true;
+#elif REQUIRES_XR_SDK
+		return false;
 #else
 		if (version >= OVRP_1_31_0.version)
 		{
@@ -4474,7 +4433,6 @@ public static class OVRPlugin
 				{
 					result = OVRP_1_38_0.ovrp_Media_EncodeMrcFrame(pointer, audioDataPtr, audioDataLen, audioChannels, timestamp, ref outSyncId);
 				}
-
 				pinnedArray.Free();
 				if (audioData != null)
 				{
@@ -4537,6 +4495,7 @@ public static class OVRPlugin
 			}
 #endif
 		}
+
 	}
 
 	public static bool SetDeveloperMode(Bool active)
@@ -5384,12 +5343,6 @@ public static class OVRPlugin
 		public static extern Result ovrp_GetDominantHand(out Handedness dominantHand);
 
 		[DllImport(pluginName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern Result ovrp_GetReorientHMDOnControllerRecenter(out Bool recenter);
-
-		[DllImport(pluginName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern Result ovrp_SetReorientHMDOnControllerRecenter(Bool recenter);
-
-		[DllImport(pluginName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern Result ovrp_SendEvent(string name, string param);
 
 		[DllImport(pluginName, CallingConvention = CallingConvention.Cdecl)]
@@ -5720,6 +5673,15 @@ public static class OVRPlugin
 		public static extern Result ovrp_Media_SetCameraMinMaxDistance(IntPtr anchorHandle, double minDistance, double maxDistance);
 	}
 
+	private static class OVRP_1_50_0
+	{
+		public static readonly System.Version version = new System.Version(1, 50, 0);
+	}
+
+	private static class OVRP_1_51_0
+	{
+		public static readonly System.Version version = new System.Version(1, 51, 0);
+	}
 #endif // !OVRPLUGIN_UNSUPPORTED_PLATFORM
 
 }

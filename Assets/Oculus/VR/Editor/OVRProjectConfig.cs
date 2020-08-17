@@ -34,7 +34,7 @@ public class OVRProjectConfig : ScriptableObject
 {
 	public enum DeviceType
 	{
-		GearVrOrGo = 0,
+		//GearVrOrGo = 0, // DEPRECATED
 		Quest = 1
 	}
 
@@ -54,6 +54,7 @@ public class OVRProjectConfig : ScriptableObject
 
 	public bool skipUnneededShaders;
 	public bool focusAware;
+	public bool requiresSystemKeyboard;
 
 	//public const string OculusProjectConfigAssetPath = "Assets/Oculus/OculusProjectConfig.asset";
 
@@ -111,7 +112,17 @@ public class OVRProjectConfig : ScriptableObject
 			projectConfig.enableNSCConfig = true;
 			projectConfig.skipUnneededShaders = false;
 			projectConfig.focusAware = true;
+			projectConfig.requiresSystemKeyboard = false;
 			AssetDatabase.CreateAsset(projectConfig, oculusProjectConfigAssetPath);
+		}
+		// Force migration to Quest device if still on legacy GearVR/Go device type
+		if (projectConfig.targetDeviceTypes.Contains((DeviceType)0)) // deprecated GearVR/Go device
+		{
+			projectConfig.targetDeviceTypes.Remove((DeviceType)0); // deprecated GearVR/Go device
+			if (!projectConfig.targetDeviceTypes.Contains(DeviceType.Quest))
+			{
+				projectConfig.targetDeviceTypes.Add(DeviceType.Quest);
+			}
 		}
 		return projectConfig;
 	}

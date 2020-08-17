@@ -34,7 +34,11 @@ using prvncher.MixedReality.Toolkit.Config;
 using prvncher.MixedReality.Toolkit.Input.Teleport;
 using prvncher.MixedReality.Toolkit.Utils;
 using UnityEngine;
+
+#if OCULUSINTEGRATION_PRESENT
 using static OVRSkeleton;
+#endif
+
 using Object = UnityEngine.Object;
 using TeleportPointer = Microsoft.MixedReality.Toolkit.Teleport.TeleportPointer;
 
@@ -58,16 +62,15 @@ namespace prvncher.MixedReality.Toolkit.OculusQuestInput
         /// </summary>
         public CustomTeleportPointer TeleportPointer { get; set; }
 
-        // Use Kalman filters to improve palm and index positions, as they drive many interactions
-        private KalmanFilterVector3 palmFilter = new KalmanFilterVector3();
-        private KalmanFilterVector3 indexTipFilter = new KalmanFilterVector3();
-
+#if OCULUSINTEGRATION_PRESENT
         private Material handMaterial = null;
         private Renderer handRenderer = null;
 
         private bool isIndexGrabbing = false;
         private bool isMiddleGrabbing = false;
         private bool isThumbGrabbing = false;
+#endif
+
 
         private int pinchStrengthProp;
 
@@ -81,11 +84,21 @@ namespace prvncher.MixedReality.Toolkit.OculusQuestInput
         public OculusQuestHand(TrackingState trackingState, Handedness controllerHandedness, IMixedRealityInputSource inputSource = null, MixedRealityInteractionMapping[] interactions = null)
             : base(trackingState, controllerHandedness, inputSource, interactions)
         {
-            palmFilter.Reset();
-            indexTipFilter.Reset();
             pinchStrengthProp = Shader.PropertyToID(MRTKOculusConfig.Instance.PinchStrengthMaterialProperty);
         }
 
+        #region IMixedRealityHand Implementation
+
+        protected readonly Dictionary<TrackedHandJoint, MixedRealityPose> jointPoses = new Dictionary<TrackedHandJoint, MixedRealityPose>();
+        /// <inheritdoc/>
+        public override bool TryGetJoint(TrackedHandJoint joint, out MixedRealityPose pose)
+        {
+            return jointPoses.TryGetValue(joint, out pose);
+        }
+
+        #endregion IMixedRealityHand Implementation
+
+#if OCULUSINTEGRATION_PRESENT
         public void InitializeHand(OVRHand ovrHand, Material handMaterial)
         {
             handRenderer = ovrHand.GetComponent<Renderer>();
@@ -125,28 +138,25 @@ namespace prvncher.MixedReality.Toolkit.OculusQuestInput
 
         public override MixedRealityInteractionMapping[] DefaultRightHandedInteractions => DefaultInteractions;
 
-        public override void SetupDefaultInteractions(Handedness controllerHandedness)
+        public override void SetupDefaultInteractions()
         {
             AssignControllerMappings(DefaultInteractions);
         }
-
-        #region IMixedRealityHand Implementation
-
-        /// <inheritdoc/>
-        public override bool TryGetJoint(TrackedHandJoint joint, out MixedRealityPose pose)
-        {
-            return jointPoses.TryGetValue(joint, out pose);
-        }
-
-        #endregion IMixedRealityHand Implementation
-
+        
         public override bool IsInPointingPose
         {
             get
             {
                 if (!TryGetJoint(TrackedHandJoint.Palm, out var palmPose)) return false;
 
-                Transform cameraTransform = CameraCache.Main.transform;
+                Camera mainCamera = CameraCache.Main;
+
+                if (mainCamera == null)
+                {
+                    return false;
+                }
+
+                Transform cameraTransform = mainCamera.transform;
 
                 Vector3 projectedPalmUp = Vector3.ProjectOnPlane(-palmPose.Up, cameraTransform.up);
 
@@ -163,9 +173,14 @@ namespace prvncher.MixedReality.Toolkit.OculusQuestInput
                 if (MRTKOculusConfig.Instance.ActiveTeleportPointerMode == MRTKOculusConfig.TeleportPointerMode.None) return false;
                 if (!TryGetJoint(TrackedHandJoint.Palm, out var palmPose)) return false;
 
-                Transform cameraTransform = CameraCache.Main.transform;
+                Camera mainCamera = CameraCache.Main;
 
-                Vector3 projectedPalmUp = Vector3.ProjectOnPlane(-palmPose.Up, cameraTransform.forward);
+                if (mainCamera == null)
+                {
+                    return false;
+                }
+
+                Transform cameraTransform = mainCamera.transform;
 
                 // We check if the palm up is roughly in line with the camera up
                 return Vector3.Dot(-palmPose.Up, cameraTransform.up) > 0.6f
@@ -232,7 +247,7 @@ namespace prvncher.MixedReality.Toolkit.OculusQuestInput
                         }
                         break;
                     case DeviceInputType.Select:
-                        Interactions[i].BoolData = IsPinching;
+                        Interactions[i].BoolData = IsPinching || IsGrabbing;
 
                         if (Interactions[i].Changed)
                         {
@@ -330,10 +345,8 @@ namespace prvncher.MixedReality.Toolkit.OculusQuestInput
                     return;
             }
         }
-
-        #region HandJoints
-        protected readonly Dictionary<TrackedHandJoint, MixedRealityPose> jointPoses = new Dictionary<TrackedHandJoint, MixedRealityPose>();
-
+        
+#region HandJoints
         protected readonly Dictionary<BoneId, TrackedHandJoint> boneJointMapping = new Dictionary<BoneId, TrackedHandJoint>()
         {
             { BoneId.Hand_Thumb1, TrackedHandJoint.ThumbMetacarpalJoint },
@@ -358,7 +371,7 @@ namespace prvncher.MixedReality.Toolkit.OculusQuestInput
             { BoneId.Hand_PinkyTip, TrackedHandJoint.PinkyTip },
             { BoneId.Hand_WristRoot, TrackedHandJoint.Wrist },
         };
-
+        
         private float _lastHighConfidenceTime = 0f;
         protected bool UpdateHandData(OVRHand ovrHand, OVRSkeleton ovrSkeleton)
         {
@@ -440,6 +453,12 @@ namespace prvncher.MixedReality.Toolkit.OculusQuestInput
             isMiddleGrabbing = HandPoseUtils.IsMiddleGrabbing(ControllerHandedness);
             isThumbGrabbing = HandPoseUtils.IsThumbGrabbing(ControllerHandedness);
 
+            // Hand Curl Properties: 
+            float indexFingerCurl = HandPoseUtils.IndexFingerCurl(ControllerHandedness);
+            float middleFingerCurl = HandPoseUtils.MiddleFingerCurl(ControllerHandedness);
+            float ringFingerCurl = HandPoseUtils.RingFingerCurl(ControllerHandedness);
+            float pinkyFingerCurl = HandPoseUtils.PinkyFingerCurl(ControllerHandedness);
+
             // Pinch was also used as grab, we want to allow hand-curl grab not just pinch.
             // Determine pinch and grab separately
             if (isTracked)
@@ -449,10 +468,11 @@ namespace prvncher.MixedReality.Toolkit.OculusQuestInput
 
             if (MRTKOculusConfig.Instance.UpdateMaterialPinchStrengthValue && handMaterial != null)
             {
-                if (IsGrabbing)
-                {
-                    pinchStrength = 1.0f;
-                }
+                float gripStrength = indexFingerCurl + middleFingerCurl + ringFingerCurl + pinkyFingerCurl;
+                gripStrength /= 4.0f;
+                gripStrength = gripStrength > 0.8f ? 1.0f : gripStrength;
+
+                pinchStrength = Mathf.Max(pinchStrength, gripStrength);
                 handMaterial.SetFloat(pinchStrengthProp, pinchStrength);
             }
             return isTracked;
@@ -565,7 +585,7 @@ namespace prvncher.MixedReality.Toolkit.OculusQuestInput
                 CoreServices.InputSystem?.RaisePoseInputChanged(InputSource, ControllerHandedness, interactionMapping.MixedRealityInputAction, currentIndexPose);
             }
         }
-
-        #endregion
+#endregion
+#endif
     }
 }

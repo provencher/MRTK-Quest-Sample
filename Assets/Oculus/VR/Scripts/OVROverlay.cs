@@ -1,12 +1,12 @@
 /************************************************************************************
 Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
 
-Licensed under the Oculus Utilities SDK License Version 1.31 (the "License"); you may not use
+Licensed under the Oculus Master SDK License Version 1.0 (the "License"); you may not use
 the Utilities SDK except in compliance with the License, which is provided at the time of installation
 or download, or which otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
-https://developer.oculus.com/licenses/utilities-1.31
+https://developer.oculus.com/licenses/oculusmastersdk-1.0/
 
 Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
@@ -18,12 +18,6 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Runtime.InteropServices;
-
-#if UNITY_2017_2_OR_NEWER
-using Settings = UnityEngine.XR.XRSettings;
-#else
-using Settings = UnityEngine.VR.VRSettings;
-#endif
 
 /// <summary>
 /// Add OVROverlay script to an object with an optional mesh primitive
@@ -185,17 +179,9 @@ public class OVROverlay : MonoBehaviour
 	/// Use this function to set texture and texNativePtr when app is running
 	/// GetNativeTexturePtr is a slow behavior, the value should be pre-cached
 	/// </summary>
-#if UNITY_2017_2_OR_NEWER
 	public void OverrideOverlayTextureInfo(Texture srcTexture, IntPtr nativePtr, UnityEngine.XR.XRNode node)
-#else
-	public void OverrideOverlayTextureInfo(Texture srcTexture, IntPtr nativePtr, UnityEngine.VR.VRNode node)
-#endif
 	{
-#if UNITY_2017_2_OR_NEWER
 		int index = (node == UnityEngine.XR.XRNode.RightEye) ? 1 : 0;
-#else
-		int index = (node == UnityEngine.VR.VRNode.RightEye) ? 1 : 0;
-#endif
 
 		if (textures.Length <= index)
 			return;
@@ -361,10 +347,8 @@ public class OVROverlay : MonoBehaviour
 
 				if (currentOverlayShape != OverlayShape.Cubemap && currentOverlayShape != OverlayShape.OffcenterCubemap)
 					sc = Texture2D.CreateExternalTexture(size.w, size.h, txFormat, useMipmaps, true, scPtr);
-#if UNITY_2017_1_OR_NEWER
 				else
 					sc = Cubemap.CreateExternalTexture(size.w, txFormat, useMipmaps, scPtr);
-#endif
 
 				layerTextures[eyeId].swapChain[stage] = sc;
 				layerTextures[eyeId].swapChainPtr[stage] = scPtr;
@@ -584,7 +568,7 @@ public class OVROverlay : MonoBehaviour
 			return eyeId == 0 ? srcRectLeft : srcRectRight;
 		}
 		else
-		{ 
+		{
 			// Get intersection of both rects if we use the same texture for both eyes
 			float minX = Mathf.Min(srcRectLeft.x, srcRectRight.x);
 			float minY = Mathf.Min(srcRectLeft.y, srcRectRight.y);
@@ -647,15 +631,12 @@ public class OVROverlay : MonoBehaviour
 				bool dataIsLinear = isHdr || (QualitySettings.activeColorSpace == ColorSpace.Linear);
 
 				var rt = textures[eyeId] as RenderTexture;
-#if !UNITY_2017_1_OR_NEWER
-				dataIsLinear |= rt != null && rt.sRGB; //HACK: Unity 5.6 and earlier convert to linear on read from sRGB RenderTexture.
-#endif
 #if UNITY_ANDROID && !UNITY_EDITOR
 				dataIsLinear = true; //HACK: Graphics.CopyTexture causes linear->srgb conversion on target write with D3D but not GLES.
 #endif
 				// PC requries premultiplied Alpha
 				bool requiresPremultipliedAlpha = !Application.isMobilePlatform;
-				
+
 				bool linearToSRGB = !isHdr && dataIsLinear;
 				// if the texture needs to be premultiplied, premultiply it unless its already premultiplied
 				bool premultiplyAlpha = requiresPremultipliedAlpha && !isAlphaPremultiplied;
@@ -670,7 +651,6 @@ public class OVROverlay : MonoBehaviour
 					if (width < 1) width = 1;
 					int height = size.h >> mip;
 					if (height < 1) height = 1;
-#if UNITY_2017_1_1 || UNITY_2017_2_OR_NEWER
 					RenderTextureDescriptor descriptor = new RenderTextureDescriptor(width, height, rtFormat, 0);
 					descriptor.msaaSamples = sampleCount;
 					descriptor.useMipMap = true;
@@ -678,9 +658,6 @@ public class OVROverlay : MonoBehaviour
 					descriptor.sRGB = false;
 
 					tempRTDst = RenderTexture.GetTemporary(descriptor);
-#else
-					tempRTDst = RenderTexture.GetTemporary(width, height, 0, rtFormat, RenderTextureReadWrite.Linear, sampleCount);
-#endif
 
 					if (!tempRTDst.IsCreated())
 					{
@@ -723,7 +700,6 @@ public class OVROverlay : MonoBehaviour
 						Graphics.CopyTexture(tempRTDst, 0, 0, et, 0, mip);
 					}
 				}
-#if UNITY_2017_1_OR_NEWER
 				else // Cubemap
 				{
 					for (int face = 0; face < 6; ++face)
@@ -741,7 +717,6 @@ public class OVROverlay : MonoBehaviour
 						}
 					}
 				}
-#endif
 				if (tempRTDst != null)
 				{
 					RenderTexture.ReleaseTemporary(tempRTDst);

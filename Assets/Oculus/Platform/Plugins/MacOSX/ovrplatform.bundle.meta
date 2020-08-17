@@ -1,24 +1,17 @@
 fileFormatVersion: 2
-guid: 5162a43dcaebd5547affacfcbc3feb6d
+guid: f55e3067d29603b40a3c84c9772d1841
 folderAsset: yes
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
   iconMap: {}
   executionOrder: {}
+  defineConstraints: []
   isPreloaded: 0
   isOverridable: 0
+  isExplicitlyReferenced: 0
+  validateReferences: 1
   platformData:
-  - first:
-      '': OSXIntel
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      '': OSXIntel64
-    second:
-      enabled: 1
-      settings: {}
   - first:
       Any: 
     second:

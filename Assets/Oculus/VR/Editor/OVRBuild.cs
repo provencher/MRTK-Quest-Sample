@@ -19,6 +19,14 @@ limitations under the License.
 
 ************************************************************************************/
 
+#if USING_XR_MANAGEMENT && USING_XR_SDK_OCULUS
+#define USING_XR_SDK
+#endif
+
+#if UNITY_2020_1_OR_NEWER
+#define REQUIRES_XR_SDK
+#endif
+
 using UnityEngine;
 using UnityEditor;
 using System;
@@ -38,8 +46,10 @@ partial class OculusBuildApp : EditorWindow
 		{
 			EditorUserBuildSettings.SwitchActiveBuildTarget (BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows);
 		}
+#if !USING_XR_SDK && !REQUIRES_XR_SDK
 		UnityEditorInternal.VR.VREditor.SetVREnabledOnTargetGroup(BuildTargetGroup.Standalone, true);
 		PlayerSettings.virtualRealitySupported = true;
+#endif
 		AssetDatabase.SaveAssets();
 	}
 
@@ -53,12 +63,14 @@ partial class OculusBuildApp : EditorWindow
 			EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android);
 		}
 
+#if !USING_XR_SDK && !REQUIRES_XR_SDK
 		UnityEditorInternal.VR.VREditor.SetVREnabledOnTargetGroup(BuildTargetGroup.Standalone, true);
 		PlayerSettings.virtualRealitySupported = true;
+#endif
 		AssetDatabase.SaveAssets();
 	}
 
-#if UNITY_EDITOR_WIN && UNITY_2018_3_OR_NEWER && UNITY_ANDROID
+#if UNITY_EDITOR_WIN && UNITY_ANDROID
 	// Build setting constants
 	const string REMOTE_APK_PATH = "/sdcard/Oculus/Temp";
 	const float USB_TRANSFER_SPEED_THRES = 25.0f;
@@ -653,5 +665,5 @@ partial class OculusBuildApp : EditorWindow
 		progressMessage = message;
 		UnityEngine.Debug.Log("OVRBuild: " + message);
 	}
-#endif //UNITY_EDITOR_WIN && UNITY_2018_1_OR_NEWER && UNITY_ANDROID
+#endif //UNITY_EDITOR_WIN && UNITY_ANDROID
 		}

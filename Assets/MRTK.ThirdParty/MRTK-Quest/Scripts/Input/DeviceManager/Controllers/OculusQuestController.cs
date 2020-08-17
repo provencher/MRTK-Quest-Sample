@@ -116,12 +116,12 @@ namespace prvncher.MixedReality.Toolkit.OculusQuestInput
 
         public override MixedRealityInteractionMapping[] DefaultRightHandedInteractions => DefaultInteractions;
 
-        [System.Obsolete]
-        public override void SetupDefaultInteractions(Handedness controllerHandedness)
+        public override void SetupDefaultInteractions()
         {
             AssignControllerMappings(DefaultInteractions);
         }
 
+#if OCULUSINTEGRATION_PRESENT
         /// <summary>
         /// Update the controller data from the provided platform state
         /// </summary>
@@ -331,7 +331,7 @@ namespace prvncher.MixedReality.Toolkit.OculusQuestInput
 
             ApplyHandMaterial();
         }
-
+#endif
         /// <summary>
         /// Updates hand material set on hand renderers with member variable stored on controller.
         /// </summary>

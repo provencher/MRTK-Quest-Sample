@@ -27,6 +27,7 @@
 //------------------------------------------------------------------------------ -
 
 using UnityEngine;
+using UnityEngine.XR;
 
 namespace prvncher.MixedReality.Toolkit.Config
 {
@@ -77,6 +78,8 @@ namespace prvncher.MixedReality.Toolkit.Config
         /// </summary>
         public bool RenderAvatarHandsInsteadOfController => renderAvatarHandsInsteadOfControllers;
 
+
+#if OCULUSINTEGRATION_PRESENT
         [Header("Prefab references")]
         [SerializeField]
         [Tooltip("Prefab reference for OVRCameraRig to load, if none are found in scene.")]
@@ -86,7 +89,7 @@ namespace prvncher.MixedReality.Toolkit.Config
         /// Prefab reference for OVRCameraRig to load, if none are found in scene.
         /// </summary>
         public OVRCameraRig OVRCameraRigPrefab => ovrCameraRigPrefab;
-
+#endif
         [SerializeField]
         [Tooltip("Use this if you want to manage the avatar hands prefab yourself.")]
         private bool allowDevToManageAvatarPrefab = false;
@@ -185,6 +188,7 @@ namespace prvncher.MixedReality.Toolkit.Config
         /// </summary>
         public string PinchStrengthMaterialProperty => pinchStrengthMaterialProperty;
 
+#if OCULUSINTEGRATION_PRESENT
         [Header("Hand Tracking Configuration")]
         [SerializeField]
         [Tooltip("Setting this to low means hands will continue to track with low confidence.")]
@@ -208,6 +212,7 @@ namespace prvncher.MixedReality.Toolkit.Config
         /// Current tracking confidence of right hand. Value managed by OculusQuestHand.cs.
         /// </summary>
         public OVRHand.TrackingConfidence CurrentRightHandTrackingConfidence { get; set; }
+#endif
 
         [SerializeField]
         [Range(0f, 5f)]
@@ -260,11 +265,32 @@ namespace prvncher.MixedReality.Toolkit.Config
             }
         }
 
+#if OCULUSINTEGRATION_PRESENT
+        [Header("Super sampling")]
+        [Range(0.7f, 2.0f)]
+        [SerializeField]
+        float resolutionScale = 1.25f;
+
+        [Header("Fixed Foveated Rendering")]
+        [SerializeField]
+        bool useDynamicFixedFoveatedRendering = true;
+        
+        [SerializeField]
+        OVRManager.FixedFoveatedRenderingLevel fixedFoveatedRenderingLevel = OVRManager.FixedFoveatedRenderingLevel.High;
+#endif
+
         public void ApplyConfiguredPerformanceSettings()
         {
-#if !UNITY_EDITOR
+#if OCULUSINTEGRATION_PRESENT
+            XRSettings.eyeTextureResolutionScale = resolutionScale;
             OVRManager.cpuLevel = CPULevel;
             OVRManager.gpuLevel = GPULevel;
+
+            if (OVRManager.fixedFoveatedRenderingSupported)
+            {
+                OVRManager.fixedFoveatedRenderingLevel = fixedFoveatedRenderingLevel;
+                OVRManager.useDynamicFixedFoveatedRendering = useDynamicFixedFoveatedRendering;
+            }
 #endif
         }
     }
