@@ -2,6 +2,8 @@
 
 Sample project for setting up with [MRTK-Quest](https://github.com/provencher/MRTK-Quest). Used only for educational purposes.
 
+**As of [MRTK 2.5](https://microsoft.github.io/MixedRealityToolkit-Unity/version/releases/2.5.0/Documentation/ReleaseNotes.html), Oculus platforms are officially supported, leveraging the code that powers MRTK-Quest. Going forward, Microsoft will be maintaining Oculus support, and as such this repository will be archived.**
+
 Some users seem to have issues with getting MRTK and the Oculus integration properly imported into their projects.
 
 As such, I'll update this repository with the latest releases of MRTK, Oculus integration and MRTK-Quest, so that it can be used as a reference.
