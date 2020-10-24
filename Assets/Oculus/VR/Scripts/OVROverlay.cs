@@ -45,6 +45,7 @@ using System.Runtime.InteropServices;
 ///					Which is usually not what people wanted, we don't kill the ability for developer to do so here, but will warn out.
 ///		5. Equirect: Display overlay as a 360-degree equirectangular skybox.
 /// </summary>
+[ExecuteInEditMode]
 public class OVROverlay : MonoBehaviour
 {
 #region Interface
@@ -94,6 +95,9 @@ public class OVROverlay : MonoBehaviour
 	public Rect srcRectRight = new Rect();
 	public Rect destRectLeft = new Rect();
 	public Rect destRectRight = new Rect();
+
+	// Used to support legacy behavior where the top left was considered the origin
+	public bool invertTextureRects = false;
 
 	private OVRPlugin.TextureRectMatrixf textureRectMatrix = OVRPlugin.TextureRectMatrixf.zero;
 
@@ -161,6 +165,27 @@ public class OVROverlay : MonoBehaviour
 	[Tooltip("When checked, the texture is treated as if the alpha was already premultiplied")]
 	public bool isAlphaPremultiplied = false;
 
+	/// <summary>
+	/// Preview the overlay in the editor using a mesh renderer.
+	/// </summary>
+	public bool previewInEditor {
+		get {
+			return _previewInEditor;
+		}
+		set {
+			if (_previewInEditor != value) {
+				_previewInEditor = value;
+				SetupEditorPreview();
+			}
+		}
+	}
+
+	[SerializeField]
+	private bool _previewInEditor = false;
+	
+#if UNITY_EDITOR
+	private GameObject previewObject;
+#endif
 
 	protected IntPtr[] texturePtrs = new IntPtr[] { IntPtr.Zero, IntPtr.Zero };
 
@@ -417,16 +442,20 @@ public class OVROverlay : MonoBehaviour
 
 	public void UpdateTextureRectMatrix()
 	{
-		Rect srcRectLeftConverted = new Rect(srcRectLeft.x, 1 - srcRectLeft.y - srcRectLeft.height, srcRectLeft.width, srcRectLeft.height);
-		Rect srcRectRightConverted = new Rect(srcRectRight.x, 1 - srcRectRight.y - srcRectRight.height, srcRectRight.width, srcRectRight.height);
+		// External surfaces are encoded with reversed UV's, so our texture rects are also inverted
+		Rect srcRectLeftConverted = new Rect(srcRectLeft.x, isExternalSurface ^ invertTextureRects ? 1 - srcRectLeft.y - srcRectLeft.height : srcRectLeft.y, srcRectLeft.width, srcRectLeft.height);
+		Rect srcRectRightConverted = new Rect(srcRectRight.x, isExternalSurface ^ invertTextureRects ? 1 - srcRectRight.y - srcRectRight.height : srcRectRight.y, srcRectRight.width, srcRectRight.height);
+		Rect destRectLeftConverted = new Rect(destRectLeft.x, isExternalSurface ^ invertTextureRects ? 1 - destRectLeft.y - destRectLeft.height : destRectLeft.y, destRectLeft.width, destRectLeft.height);
+		Rect destRectRightConverted = new Rect(destRectRight.x, isExternalSurface ^ invertTextureRects ? 1 - destRectRight.y - destRectRight.height : destRectRight.y, destRectRight.width, destRectRight.height);
 		textureRectMatrix.leftRect = srcRectLeftConverted;
 		textureRectMatrix.rightRect = srcRectRightConverted;
-		float leftWidthFactor = srcRectLeftConverted.width / destRectLeft.width;
-		float leftHeightFactor = srcRectLeftConverted.height / destRectLeft.height;
-		textureRectMatrix.leftScaleBias = new Vector4(leftWidthFactor, leftHeightFactor, srcRectLeftConverted.x - destRectLeft.x * leftWidthFactor, srcRectLeftConverted.y - destRectLeft.y * leftHeightFactor);
-		float rightWidthFactor = srcRectRightConverted.width / destRectRight.width;
-		float rightHeightFactor = srcRectRightConverted.height / destRectRight.height;
-		textureRectMatrix.rightScaleBias = new Vector4(rightWidthFactor, rightHeightFactor, srcRectRightConverted.x - destRectRight.x * rightWidthFactor, srcRectRightConverted.y - destRectRight.y * rightHeightFactor);
+
+		float leftWidthFactor = srcRectLeft.width / destRectLeft.width;
+		float leftHeightFactor = srcRectLeft.height / destRectLeft.height;
+		textureRectMatrix.leftScaleBias = new Vector4(leftWidthFactor, leftHeightFactor, srcRectLeftConverted.x - destRectLeftConverted.x * leftWidthFactor, srcRectLeftConverted.y - destRectLeftConverted.y * leftHeightFactor);
+		float rightWidthFactor = srcRectRight.width / destRectRight.width;
+		float rightHeightFactor = srcRectRight.height / destRectRight.height;
+		textureRectMatrix.rightScaleBias = new Vector4(rightWidthFactor, rightHeightFactor, srcRectRightConverted.x - destRectRightConverted.x * rightWidthFactor, srcRectRightConverted.y - destRectRightConverted.y * rightHeightFactor);
 	}
 
 	public void SetPerLayerColorScaleAndOffset(Vector4 scale, Vector4 offset)
@@ -748,17 +777,40 @@ public class OVROverlay : MonoBehaviour
 		return isOverlayVisible;
 	}
 
+	private void SetupEditorPreview()
+	{
+		#if UNITY_EDITOR
+			if (previewInEditor && previewObject == null)
+			{
+				previewObject = new GameObject();
+				previewObject.hideFlags = HideFlags.HideAndDontSave;
+				previewObject.transform.SetParent(this.transform, false);
+				OVROverlayMeshGenerator generator = previewObject.AddComponent<OVROverlayMeshGenerator>();
+				generator.SetOverlay(this);
+
+			}
+			else if (!previewInEditor && previewObject != null)
+			{
+				UnityEngine.Object.DestroyImmediate(previewObject);
+				previewObject = null;
+			}
+		#endif
+	}
+
 #region Unity Messages
 
 	void Awake()
 	{
 		Debug.Log("Overlay Awake");
 
-		if (tex2DMaterial == null)
-			tex2DMaterial = new Material(Shader.Find("Oculus/Texture2D Blit"));
+		if (Application.isPlaying)
+		{
+			if (tex2DMaterial == null)
+				tex2DMaterial = new Material(Shader.Find("Oculus/Texture2D Blit"));
 
-		if (cubeMaterial == null)
-			cubeMaterial = new Material(Shader.Find("Oculus/Cubemap Blit"));
+			if (cubeMaterial == null)
+				cubeMaterial = new Material(Shader.Find("Oculus/Cubemap Blit"));
+		}
 
 		rend = GetComponent<Renderer>();
 
@@ -768,6 +820,8 @@ public class OVROverlay : MonoBehaviour
 		// Backward compatibility
 		if (rend != null && textures[0] == null)
 			textures[0] = rend.material.mainTexture;
+
+		SetupEditorPreview();
 	}
 
 	static public string OpenVROverlayKey { get { return "unity:" + Application.companyName + "." + Application.productName; } }
@@ -777,6 +831,12 @@ public class OVROverlay : MonoBehaviour
 	{
 		if (OVRManager.OVRManagerinitialized)
 			InitOVROverlay();
+
+	#if UNITY_EDITOR
+		if (previewObject != null) {
+			previewObject.SetActive(true);
+		}
+	#endif
 	}
 
 	void InitOVROverlay()
@@ -813,6 +873,13 @@ public class OVROverlay : MonoBehaviour
 
 	void OnDisable()
 	{
+	
+	#if UNITY_EDITOR
+		if (previewObject != null) {
+			previewObject.SetActive(false);
+		}
+	#endif
+
 		if ((gameObject.hideFlags & HideFlags.DontSaveInBuild) != 0)
 			return;
 
@@ -847,6 +914,12 @@ public class OVROverlay : MonoBehaviour
 	{
 		DestroyLayerTextures();
 		DestroyLayer();
+
+	#if UNITY_EDITOR
+		if (previewObject != null) {
+			GameObject.DestroyImmediate(previewObject);
+		}
+	#endif
 	}
 
 	bool ComputeSubmit(ref OVRPose pose, ref Vector3 scale, ref bool overlay, ref bool headLocked)

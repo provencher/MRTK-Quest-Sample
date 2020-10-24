@@ -85,7 +85,8 @@ public class OVRCameraRig : MonoBehaviour
 	public bool usePerEyeCameras = false;
 	/// <summary>
 	/// If true, all tracked anchors are updated in FixedUpdate instead of Update to favor physics fidelity.
-	/// \note: If the fixed update rate doesn't match the rendering framerate (OVRManager.display.appFramerate), the anchors will visibly judder.
+	/// \note: This will cause visible judder unless you tick exactly once per frame using a custom physics
+	/// update, because you'll be sampling the position at different times into each frame.
 	/// </summary>
 	public bool useFixedUpdateForTracking = false;
 	/// <summary>

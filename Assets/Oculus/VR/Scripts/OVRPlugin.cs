@@ -47,7 +47,7 @@ public static class OVRPlugin
 #if OVRPLUGIN_UNSUPPORTED_PLATFORM
 	public static readonly System.Version wrapperVersion = _versionZero;
 #else
-	public static readonly System.Version wrapperVersion = OVRP_1_51_0.version;
+	public static readonly System.Version wrapperVersion = OVRP_1_52_0.version;
 #endif
 
 #if !OVRPLUGIN_UNSUPPORTED_PLATFORM
@@ -310,7 +310,7 @@ public static class OVRPlugin
 
 		// Standalone headsets
 		Oculus_Quest = 8,
-		Placeholder_9,
+		Oculus_Quest_2 = 9,
 		Placeholder_10,
 		Placeholder_11,
 		Placeholder_12,
@@ -468,7 +468,7 @@ public static class OVRPlugin
 		public static readonly Vector3f zero = new Vector3f { x = 0.0f, y = 0.0f, z = 0.0f };
 		public override string ToString()
 		{
-			return string.Format("{0}, {1}, {2}", x, y, z);
+			return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}, {1}, {2}", x, y, z);
 		}
 	}
 
@@ -482,7 +482,7 @@ public static class OVRPlugin
 		public static readonly Vector4f zero = new Vector4f { x = 0.0f, y = 0.0f, z = 0.0f, w = 0.0f };
 		public override string ToString()
 		{
-			return string.Format("{0}, {1}, {2}, {3}", x, y, z, w);
+			return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}, {1}, {2}, {3}", x, y, z, w);
 		}
 	}
 
@@ -496,7 +496,7 @@ public static class OVRPlugin
 		public static readonly Vector4s zero = new Vector4s { x = 0, y = 0, z = 0, w = 0 };
 		public override string ToString()
 		{
-			return string.Format("{0}, {1}, {2}, {3}", x, y, z, w);
+			return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}, {1}, {2}, {3}", x, y, z, w);
 		}
 	}
 
@@ -510,7 +510,7 @@ public static class OVRPlugin
 		public static readonly Quatf identity = new Quatf { x = 0.0f, y = 0.0f, z = 0.0f, w = 1.0f };
 		public override string ToString()
 		{
-			return string.Format("{0}, {1}, {2}, {3}", x, y, z, w);
+			return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}, {1}, {2}, {3}", x, y, z, w);
 		}
 	}
 
@@ -522,7 +522,7 @@ public static class OVRPlugin
 		public static readonly Posef identity = new Posef { Orientation = Quatf.identity, Position = Vector3f.zero };
 		public override string ToString()
 		{
-			return string.Format("Position ({0}), Orientation({1})", Position, Orientation);
+			return string.Format(System.Globalization.CultureInfo.InvariantCulture, "Position ({0}), Orientation({1})", Position, Orientation);
 		}
 	}
 
@@ -537,7 +537,7 @@ public static class OVRPlugin
 
 		public override string ToString()
 		{
-			return string.Format("Rect Left ({0}), Rect Right({1}), Scale Bias Left ({2}), Scale Bias Right({3})", leftRect, rightRect, leftScaleBias, rightScaleBias);
+			return string.Format(System.Globalization.CultureInfo.InvariantCulture, "Rect Left ({0}), Rect Right({1}), Scale Bias Left ({2}), Scale Bias Right({3})", leftRect, rightRect, leftScaleBias, rightScaleBias);
 		}
 	}
 
@@ -5681,6 +5681,11 @@ public static class OVRPlugin
 	private static class OVRP_1_51_0
 	{
 		public static readonly System.Version version = new System.Version(1, 51, 0);
+	}
+
+	private static class OVRP_1_52_0
+	{
+		public static readonly System.Version version = new System.Version(1, 52, 0);
 	}
 #endif // !OVRPLUGIN_UNSUPPORTED_PLATFORM
 

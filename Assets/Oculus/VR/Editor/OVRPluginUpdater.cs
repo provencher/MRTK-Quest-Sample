@@ -406,7 +406,6 @@ class OVRPluginUpdater
 	[MenuItem("Oculus/Tools/Disable OVR Utilities Plugin")]
 	private static void AttemptPluginDisable()
 	{
-		PluginPackage bundledPluginPkg = GetBundledPluginPackage();
 		List<PluginPackage> allUtilsPluginPkgs = GetAllUtilitiesPluginPackages();
 
 		PluginPackage enabledUtilsPluginPkg = null;

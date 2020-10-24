@@ -103,12 +103,6 @@ public class OVRGradleGeneration
 		}
 #endif
 
-#if UNITY_ANDROID && USING_XR_SDK && !USING_COMPATIBLE_OCULUS_XR_PLUGIN_VERSION
-		if (PlayerSettings.Android.targetArchitectures != AndroidArchitecture.ARM64)
-			throw new BuildFailedException("Your project is using an Oculus XR Plugin version with known issues. Please navigate to the Package Manager and upgrade the Oculus XR Plugin to the latest verified version. When performing the upgrade" +
-				", you must first \"Remove\" the Oculus XR Plugin package, and then \"Install\" the package at the verified version. Be sure to remove, then install, not just upgrade.");
-#endif
-
 		buildStartTime = System.DateTime.Now;
 		buildGuid = System.Guid.NewGuid();
 
@@ -141,12 +135,15 @@ public class OVRGradleGeneration
 		UnityEngine.Debug.Log("OVRGradleGeneration triggered.");
 
 		var targetOculusPlatform = new List<string>();
-		if (OVRDeviceSelector.isTargetDeviceQuest)
+		if (OVRDeviceSelector.isTargetDeviceQuestFamily)
 		{
 			targetOculusPlatform.Add("quest");
 		}
 		OVRPlugin.AddCustomMetadata("target_oculus_platform", String.Join("_", targetOculusPlatform.ToArray()));
-		UnityEngine.Debug.LogFormat("Quest = {0}", OVRDeviceSelector.isTargetDeviceQuest);
+		UnityEngine.Debug.LogFormat("QuestFamily = {0}: Quest = {1}, Quest2 = {2}", 
+			OVRDeviceSelector.isTargetDeviceQuestFamily,
+			OVRDeviceSelector.isTargetDeviceQuest,
+			OVRDeviceSelector.isTargetDeviceQuest2);
 
 #if UNITY_2019_3_OR_NEWER
 		string gradleBuildPath = Path.Combine(path, "../launcher/build.gradle");
