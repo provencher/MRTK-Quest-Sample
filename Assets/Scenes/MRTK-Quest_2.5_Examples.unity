@@ -50868,7 +50868,7 @@ PrefabInstance:
     - target: {fileID: 959061154081218648, guid: c0931c4da6d91ea429abedb10290dd16,
         type: 3}
       propertyPath: startDimensionIndex
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1713571739358940556, guid: c0931c4da6d91ea429abedb10290dd16,
         type: 3}
@@ -50949,6 +50949,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_isInputParsingRequired
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4546402662010242382, guid: c0931c4da6d91ea429abedb10290dd16,
+        type: 3}
+      propertyPath: isHandJointVisible
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4943773361295851263, guid: c0931c4da6d91ea429abedb10290dd16,
         type: 3}
