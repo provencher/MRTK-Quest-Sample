@@ -6,12 +6,11 @@ Sample project for setting up with [MRTK-Quest](https://github.com/provencher/MR
 
 Some users seem to have issues with getting MRTK and the Oculus integration properly imported into their projects.
 
-As such, this repo serves as an example setup for the official MRTK Oculus integration, using examples from MRTK-Quest.
+As such, this repo serves as an example setup for the official MRTK Oculus integration, using examples from MRTK-Quest. MRTK-Quest 1.2 is not a part of this project.
 
 Further, to make this easier for people who struggle with Git to download, the repository **does not** use submodules, symlinks or git lfs.
 
 Current setup:
-- [MRTK-Quest](https://github.com/provencher/MRTK-Quest/releases/tag/v1.2.0) V1.2.0
 - [MRTK](https://github.com/microsoft/MixedRealityToolkit-Unity) V2.5.1
 - [Oculus Integration](https://assetstore.unity.com/packages/tools/integration/oculus-integration-82022) v20.1
 - Unity 2019.4.12f1
