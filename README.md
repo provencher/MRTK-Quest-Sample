@@ -13,7 +13,7 @@ Further, to make this easier for people who struggle with Git to download, the r
 Current setup:
 - [MRTK](https://github.com/microsoft/MixedRealityToolkit-Unity) V2.5.1
 - [Oculus Integration](https://assetstore.unity.com/packages/tools/integration/oculus-integration-82022) v20.1
-- Unity 2019.4.12f1
+- Unity 2019.4.17f1 LTS
 
 Note:
 - While developping with this sample, you may have to run this cript below, which will bind the Oculus prefab references to the OculusXRSDKDeviceManagerProfile  ![Install Oculus](https://user-images.githubusercontent.com/7420990/97363151-81ef0700-1878-11eb-9b49-0dc26e120a79.png)
