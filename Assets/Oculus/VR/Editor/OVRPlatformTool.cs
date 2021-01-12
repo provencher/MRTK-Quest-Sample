@@ -1030,7 +1030,12 @@ namespace Assets.Oculus.VR.Editor
 			webRequest.timeout = 60;
 			UnityWebRequestAsyncOperation webOp = webRequest.SendWebRequest();
 			while (!webOp.isDone) { }
+#if UNITY_2020_1_OR_NEWER
+			if (webRequest.result == UnityWebRequest.Result.ConnectionError ||
+				webRequest.result == UnityWebRequest.Result.ProtocolError)
+#else
 			if (webRequest.isNetworkError || webRequest.isHttpError)
+#endif
 			{
 				var networkErrorMsg = "Failed to provision Oculus Platform Util\n";
 				UnityEngine.Debug.LogError(networkErrorMsg);

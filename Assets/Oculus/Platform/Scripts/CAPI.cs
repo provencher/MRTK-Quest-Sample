@@ -362,6 +362,15 @@ namespace Oculus.Platform
     [DllImport(DLL_NAME, CallingConvention=CallingConvention.Cdecl)]
     public static extern IntPtr ovr_ApplicationLifecycle_GetLaunchDetails();
 
+    public static void ovr_ApplicationLifecycle_LogDeeplinkResult(string trackingID, LaunchResult result) {
+      IntPtr trackingID_native = StringToNative(trackingID);
+      ovr_ApplicationLifecycle_LogDeeplinkResult_Native(trackingID_native, result);
+      Marshal.FreeCoTaskMem(trackingID_native);
+    }
+
+    [DllImport(DLL_NAME, CallingConvention=CallingConvention.Cdecl, EntryPoint="ovr_ApplicationLifecycle_LogDeeplinkResult")]
+    private static extern void ovr_ApplicationLifecycle_LogDeeplinkResult_Native(IntPtr trackingID, LaunchResult result);
+
     public static ulong ovr_HTTP_StartTransfer(string url, ovrKeyValuePair[] headers) {
       IntPtr url_native = StringToNative(url);
       UIntPtr headers_length = (UIntPtr)headers.Length;
@@ -1036,6 +1045,9 @@ namespace Oculus.Platform
 
     [DllImport(DLL_NAME, CallingConvention=CallingConvention.Cdecl, EntryPoint="ovr_Livestreaming_IsAllowedForApplication")]
     private static extern ulong ovr_Livestreaming_IsAllowedForApplication_Native(IntPtr packageName);
+
+    [DllImport(DLL_NAME, CallingConvention=CallingConvention.Cdecl)]
+    public static extern ulong ovr_Livestreaming_LaunchLivestreamingFlow();
 
     [DllImport(DLL_NAME, CallingConvention=CallingConvention.Cdecl)]
     public static extern ulong ovr_Livestreaming_PauseStream();
@@ -2241,6 +2253,14 @@ namespace Oculus.Platform
 
     [DllImport(DLL_NAME, CallingConvention=CallingConvention.Cdecl)]
     public static extern UInt64 ovr_LaunchDetails_GetRoomID(IntPtr obj);
+
+    public static string ovr_LaunchDetails_GetTrackingID(IntPtr obj) {
+      var result = StringFromNative(ovr_LaunchDetails_GetTrackingID_Native(obj));
+      return result;
+    }
+
+    [DllImport(DLL_NAME, CallingConvention=CallingConvention.Cdecl, EntryPoint="ovr_LaunchDetails_GetTrackingID")]
+    private static extern IntPtr ovr_LaunchDetails_GetTrackingID_Native(IntPtr obj);
 
     [DllImport(DLL_NAME, CallingConvention=CallingConvention.Cdecl)]
     public static extern IntPtr ovr_LaunchDetails_GetUsers(IntPtr obj);
@@ -3712,6 +3732,15 @@ namespace Oculus.Platform
 
     [DllImport(DLL_NAME, CallingConvention=CallingConvention.Cdecl)]
     public static extern void ovr_RichPresenceOptions_SetExtraContext(IntPtr handle, RichPresenceExtraContext value);
+
+    public static void ovr_RichPresenceOptions_SetInstanceId(IntPtr handle, string value) {
+      IntPtr value_native = StringToNative(value);
+      ovr_RichPresenceOptions_SetInstanceId_Native(handle, value_native);
+      Marshal.FreeCoTaskMem(value_native);
+    }
+
+    [DllImport(DLL_NAME, CallingConvention=CallingConvention.Cdecl, EntryPoint="ovr_RichPresenceOptions_SetInstanceId")]
+    private static extern void ovr_RichPresenceOptions_SetInstanceId_Native(IntPtr handle, IntPtr value);
 
     [DllImport(DLL_NAME, CallingConvention=CallingConvention.Cdecl)]
     public static extern void ovr_RichPresenceOptions_SetIsIdle(IntPtr handle, bool value);
