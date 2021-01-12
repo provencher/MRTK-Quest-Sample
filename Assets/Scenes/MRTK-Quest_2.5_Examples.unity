@@ -50729,7 +50729,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: MRTK 2.5.1
+  m_text: MRTK 2.5.3
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: afc8299d5d5bbd440a0616c8ecbc7217, type: 2}
   m_sharedMaterial: {fileID: 21340371490990018, guid: afc8299d5d5bbd440a0616c8ecbc7217,
@@ -60336,6 +60336,7 @@ GameObject:
   - component: {fileID: 1087739259}
   - component: {fileID: 1087739258}
   - component: {fileID: 1087739262}
+  - component: {fileID: 1087739257}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -60357,6 +60358,29 @@ Transform:
   m_Father: {fileID: 1395862314}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1087739257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1087739255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf98dd1206224111a38765365e98e207, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockCursorWhenFocusLocked: 1
+  setCursorInvisibleWhenFocusLocked: 0
+  maxGazeCollisionDistance: 10
+  raycastLayerMasks:
+  - serializedVersion: 2
+    m_Bits: 4294967291
+  stabilizer:
+    storedStabilitySamples: 60
+  gazeTransform: {fileID: 0}
+  minHeadVelocityThreshold: 0.5
+  maxHeadVelocityThreshold: 2
 --- !u!114 &1087739258
 MonoBehaviour:
   m_ObjectHideFlags: 0
