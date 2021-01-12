@@ -11,8 +11,8 @@ As such, this repo serves as an example setup for the official MRTK Oculus integ
 Further, to make this easier for people who struggle with Git to download, the repository **does not** use submodules, symlinks or git lfs.
 
 Current setup:
-- [MRTK](https://github.com/microsoft/MixedRealityToolkit-Unity) V2.5.1
-- [Oculus Integration](https://assetstore.unity.com/packages/tools/integration/oculus-integration-82022) v20.1
+- [MRTK](https://github.com/microsoft/MixedRealityToolkit-Unity) V2.5.3
+- [Oculus Integration](https://assetstore.unity.com/packages/tools/integration/oculus-integration-82022) v23.1
 - Unity 2019.4.17f1 LTS
 
 Note:
