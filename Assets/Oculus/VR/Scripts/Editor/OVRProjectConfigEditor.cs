@@ -63,6 +63,7 @@ public class OVRProjectConfigEditor : Editor
 		// Hand Tracking Support
 		OVREditorUtil.SetupEnumField(projectConfig, "Hand Tracking Support", ref projectConfig.handTrackingSupport, ref hasModified);
 
+
 		// System Keyboard Support
 		OVREditorUtil.SetupBoolField(projectConfig, new GUIContent("Requires System Keyboard",
 			"*Requires Focus Awareness* If checked, the Oculus System keyboard will be enabled for Unity input fields and any calls to open/close the Unity TouchScreenKeyboard."),

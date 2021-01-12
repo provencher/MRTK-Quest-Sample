@@ -1,36 +1,36 @@
 {
   "dependencies": {
     "com.microsoft.mixedreality.toolkit.examples": {
-      "version": "2.5.1",
+      "version": "2.5.3",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.microsoft.mixedreality.toolkit.foundation": "2.5.1",
-        "com.microsoft.mixedreality.toolkit.extensions": "2.5.1"
+        "com.microsoft.mixedreality.toolkit.foundation": "2.5.3",
+        "com.microsoft.mixedreality.toolkit.extensions": "2.5.3"
       },
       "url": "https://pkgs.dev.azure.com/aipmr/MixedReality-Unity-Packages/_packaging/Unity-packages/npm/registry"
     },
     "com.microsoft.mixedreality.toolkit.extensions": {
-      "version": "2.5.1",
+      "version": "2.5.3",
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.microsoft.mixedreality.toolkit.foundation": "2.5.1"
+        "com.microsoft.mixedreality.toolkit.foundation": "2.5.3"
       },
       "url": "https://pkgs.dev.azure.com/aipmr/MixedReality-Unity-Packages/_packaging/Unity-packages/npm/registry"
     },
     "com.microsoft.mixedreality.toolkit.foundation": {
-      "version": "2.5.1",
-      "depth": 0,
+      "version": "2.5.3",
+      "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.microsoft.mixedreality.toolkit.standardassets": "2.5.1"
+        "com.microsoft.mixedreality.toolkit.standardassets": "2.5.3"
       },
       "url": "https://pkgs.dev.azure.com/aipmr/MixedReality-Unity-Packages/_packaging/Unity-packages/npm/registry"
     },
     "com.microsoft.mixedreality.toolkit.standardassets": {
-      "version": "2.5.1",
-      "depth": 1,
+      "version": "2.5.3",
+      "depth": 2,
       "source": "registry",
       "dependencies": {
         "com.unity.textmeshpro": "2.1.1"
@@ -38,11 +38,11 @@
       "url": "https://pkgs.dev.azure.com/aipmr/MixedReality-Unity-Packages/_packaging/Unity-packages/npm/registry"
     },
     "com.microsoft.mixedreality.toolkit.tools": {
-      "version": "2.5.1",
+      "version": "2.5.3",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.microsoft.mixedreality.toolkit.foundation": "2.5.1"
+        "com.microsoft.mixedreality.toolkit.foundation": "2.5.3"
       },
       "url": "https://pkgs.dev.azure.com/aipmr/MixedReality-Unity-Packages/_packaging/Unity-packages/npm/registry"
     },
@@ -137,11 +137,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.oculus": {
-      "version": "1.5.0",
+      "version": "1.7.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.xr.management": "3.0.6",
+        "com.unity.xr.management": "3.2.16",
         "com.unity.ugui": "1.0.0"
       },
       "url": "https://packages.unity.com"

@@ -319,6 +319,8 @@ public class OVROverlayEditor : Editor
 				overlay.invertTextureRects = EditorGUILayout.Toggle(new GUIContent("Invert Rect Coordinates", "Check this box to use the top left corner of the texture as the origin"), overlay.invertTextureRects);
 			}
 		}
+
+
 		EditorGUILayout.Separator();
 		EditorGUILayout.LabelField("Color Scale", EditorStyles.boldLabel);
 		EditorGUILayout.Space();

@@ -1,12 +1,8 @@
 /************************************************************************************
 Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
 
-Licensed under the Oculus Master SDK License Version 1.0 (the "License"); you may not use
-the Utilities SDK except in compliance with the License, which is provided at the time of installation
-or download, or which otherwise accompanies this software in either electronic or hard copy form.
-
-You may obtain a copy of the License at
-https://developer.oculus.com/licenses/oculusmastersdk-1.0/
+Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
+https://developer.oculus.com/licenses/oculussdk/
 
 Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
@@ -33,7 +29,7 @@ public class OVRExternalComposition : OVRComposition
 	public GameObject backgroundCameraGameObject = null;
 	public Camera backgroundCamera = null;
 #if OVR_ANDROID_MRC
-	public bool renderCombinedFrame = true;
+	public bool renderCombinedFrame = false;
 	public AudioListener audioListener;
 	public OVRMRAudioFilter audioFilter;
 	public RenderTexture[] mrcRenderTextureArray = new RenderTexture[2];
@@ -53,12 +49,7 @@ public class OVRExternalComposition : OVRComposition
 		: base(parentObject, mainCamera)
 	{
 #if OVR_ANDROID_MRC
-		renderCombinedFrame = true;
-		if (GraphicsSettings.renderPipelineAsset != null)
-		{
-			Debug.Log("[OVRExternalComposition] scriptable rendering pipeline detected, Camera.rect is not supported");
-			renderCombinedFrame = false;
-		}
+		renderCombinedFrame = false;
 
 		int frameWidth;
 		int frameHeight;

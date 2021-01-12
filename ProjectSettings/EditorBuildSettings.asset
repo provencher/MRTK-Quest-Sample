@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Oculus_HandInteractionExamples.unity
-    guid: 948d9b4e507e65d4484f2921f5f24d09
+    path: Assets/Scenes/MRTK-Quest_2.5_Examples.unity
+    guid: 330348f766b8edf4c99b87ef08c721f8
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: b1a734d715cea0043bf356a4c3fc51f0,
       type: 2}

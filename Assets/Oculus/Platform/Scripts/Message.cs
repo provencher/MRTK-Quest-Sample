@@ -133,6 +133,7 @@ namespace Oculus.Platform
       Leaderboard_GetPreviousEntries                      = 0x4901DAC0,
       Leaderboard_WriteEntry                              = 0x117FC8FE,
       Livestreaming_GetStatus                             = 0x489A6995,
+      Livestreaming_LaunchLivestreamingFlow               = 0x6AB156BD,
       Livestreaming_PauseStream                           = 0x369C7683,
       Livestreaming_ResumeStream                          = 0x22526D8F,
       Matchmaking_Browse                                  = 0x1E6532C8,
@@ -283,6 +284,9 @@ namespace Oculus.Platform
       /// generated, and that you may call the `GetSystemVoip...()` family of
       /// functions at any time to get the current state directly.
       Notification_Voip_SystemVoipState = 0x58D254A5,
+
+      /// Get surface and update action from platform webrtc for update.
+      Notification_Vrcamera_GetSurfaceUpdate = 0x37F21084,
 
 
       Platform_InitializeWithAccessToken = 0x35692F2B,
@@ -507,6 +511,7 @@ namespace Oculus.Platform
         case Message.MessageType.Challenges_Delete:
         case Message.MessageType.Entitlement_GetIsViewerEntitled:
         case Message.MessageType.IAP_ConsumePurchase:
+        case Message.MessageType.Livestreaming_LaunchLivestreamingFlow:
         case Message.MessageType.Matchmaking_Cancel:
         case Message.MessageType.Matchmaking_Cancel2:
         case Message.MessageType.Matchmaking_ReportResultInsecure:
@@ -661,6 +666,7 @@ namespace Oculus.Platform
         case Message.MessageType.CloudStorage2_GetUserDirectoryPath:
         case Message.MessageType.Notification_ApplicationLifecycle_LaunchIntentChanged:
         case Message.MessageType.Notification_Room_InviteAccepted:
+        case Message.MessageType.Notification_Vrcamera_GetSurfaceUpdate:
         case Message.MessageType.User_GetAccessToken:
           message = new MessageWithString(messageHandle);
           break;

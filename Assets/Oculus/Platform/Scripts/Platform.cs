@@ -148,6 +148,9 @@ namespace Oculus.Platform
     public static Models.LaunchDetails GetLaunchDetails() {
       return new Models.LaunchDetails(CAPI.ovr_ApplicationLifecycle_GetLaunchDetails());
     }
+    public static void LogDeeplinkResult(string trackingID, LaunchResult result) {
+      CAPI.ovr_ApplicationLifecycle_LogDeeplinkResult(trackingID, result);
+    }
   }
 
   public static partial class Rooms
@@ -1425,6 +1428,18 @@ namespace Oculus.Platform
       return null;
     }
 
+    /// Launch the Livestreaming Flow.
+    ///
+    public static Request LaunchLivestreamingFlow()
+    {
+      if (Core.IsInitialized())
+      {
+        return new Request(CAPI.ovr_Livestreaming_LaunchLivestreamingFlow());
+      }
+
+      return null;
+    }
+
     /// Pauses the livestreaming session if there is one. NOTE: this function is
     /// safe to call if no session is active.
     ///
@@ -2598,6 +2613,20 @@ namespace Oculus.Platform
     {
       Callback.SetNotificationCallback(
         Message.MessageType.Notification_Voip_SystemVoipState,
+        callback
+      );
+    }
+
+  }
+
+  public static partial class Vrcamera
+  {
+    /// Get surface and update action from platform webrtc for update.
+    ///
+    public static void SetGetSurfaceUpdateNotificationCallback(Message<string>.Callback callback)
+    {
+      Callback.SetNotificationCallback(
+        Message.MessageType.Notification_Vrcamera_GetSurfaceUpdate,
         callback
       );
     }
